@@ -35,14 +35,14 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* Body & Latar Belakang Gradasi Mesh Dinamis */
+        /* Body & Soft Ocean Pastel Gradient */
         body {
-            background-color: #f1f5f9;
+            background-color: #e2eaf4;
             background-image: 
-                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.12) 0px, transparent 50%),
-                radial-gradient(at 100% 0%, rgba(249, 115, 22, 0.10) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(15, 23, 42, 0.08) 0px, transparent 50%),
-                radial-gradient(at 0% 100%, rgba(14, 165, 233, 0.12) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(186, 230, 253, 0.7) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(254, 215, 170, 0.4) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(224, 231, 255, 0.6) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(191, 219, 254, 0.7) 0px, transparent 50%);
             background-attachment: fixed;
             color: var(--text-main);
             padding-bottom: 50px;
@@ -50,8 +50,8 @@
             overflow-x: hidden;
         }
 
-        /* Elemen Overlay Garis Gelombang Subtil (Contour Wave Lines) */
-        .wave-bg-overlay {
+        /* Elemen SVG Overlay Angin & Gelombang */
+        .ocean-wind-overlay {
             position: fixed;
             top: 0;
             left: 0;
@@ -61,45 +61,9 @@
             pointer-events: none;
         }
 
-        .wave-bg-overlay svg {
+        .ocean-wind-overlay svg {
             width: 100%;
             height: 100%;
-        }
-
-        /* Shape Abstrak Melayang 1 (Pojok Kiri Atas) */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 15%;
-            left: -100px;
-            width: 380px;
-            height: 380px;
-            background: linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(14, 165, 233, 0.08));
-            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
-            z-index: -2;
-            filter: blur(50px);
-            animation: floatShape 18s ease-in-out infinite alternate;
-        }
-
-        /* Shape Abstrak Melayang 2 (Pojok Kanan Bawah) */
-        body::after {
-            content: '';
-            position: fixed;
-            bottom: 5%;
-            right: -80px;
-            width: 420px;
-            height: 420px;
-            background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(234, 88, 12, 0.06));
-            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-            z-index: -2;
-            filter: blur(60px);
-            animation: floatShape 22s ease-in-out infinite alternate-reverse;
-        }
-
-        /* Animasi Soft Floating Shapes */
-        @keyframes floatShape {
-            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
-            100% { transform: translate(40px, 60px) rotate(120deg) scale(1.1); }
         }
 
         /* Header & Logo */
@@ -149,7 +113,7 @@
             font-weight: 300;
         }
 
-        /* Method Selector Switcher (Header Tabs) */
+        /* Method Selector Switcher */
         .method-tabs {
             display: flex;
             background: rgba(15, 23, 42, 0.6);
@@ -203,14 +167,14 @@
             grid-template-columns: 1fr;
         }
 
-        /* Kartu Glassmorphism Modern */
+        /* Kartu Glassmorphism */
         .card {
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border-radius: 12px;
             padding: 22px;
-            border: 1px solid rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.9);
             box-shadow: 0 8px 24px 0 rgba(15, 23, 42, 0.05);
             margin-bottom: 24px;
         }
@@ -299,7 +263,7 @@
             cursor: pointer;
         }
 
-        /* Summary Metric Cards (Glassmorphic) */
+        /* Metric Cards */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -308,10 +272,10 @@
         }
 
         .metric-card {
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
             border-left: 5px solid var(--accent);
             padding: 16px;
             border-radius: 10px;
@@ -425,18 +389,44 @@
 </head>
 <body>
 
-    <!-- ELEMEN DEKORASI GARIS GELOMBANG LATAR BELAKANG -->
-    <div class="wave-bg-overlay">
+    <!-- VEKTOR ANGIN & OMBAK LATAR BELAKANG -->
+    <div class="ocean-wind-overlay">
         <svg preserveAspectRatio="none" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Gelombang Atas (Biru/Cyan) -->
-            <path d="M-100 180 C 250 80, 550 380, 950 180 C 1350 -20, 1600 280, 1900 180" stroke="#2563eb" stroke-width="1.8" stroke-dasharray="6 6" opacity="0.25"/>
-            <path d="M-100 220 C 300 120, 600 420, 1000 220 C 1400 20, 1650 320, 1950 220" stroke="#0ea5e9" stroke-width="2" opacity="0.2"/>
-            <path d="M-100 260 C 350 160, 650 460, 1050 260 C 1450 60, 1700 360, 2000 260" stroke="#1e3a8a" stroke-width="1.2" opacity="0.2"/>
             
-            <!-- Gelombang Bawah (Oranye/Cyan) -->
-            <path d="M-100 680 C 300 520, 650 820, 1050 650 C 1450 480, 1700 780, 2000 650" stroke="#f97316" stroke-width="1.8" stroke-dasharray="8 4" opacity="0.2"/>
-            <path d="M-100 720 C 350 560, 700 860, 1100 690 C 1500 520, 1750 820, 2050 690" stroke="#ea580c" stroke-width="1.5" opacity="0.18"/>
-            <path d="M-100 760 C 400 600, 750 900, 1150 730 C 1550 560, 1800 860, 2100 730" stroke="#0ea5e9" stroke-width="2" opacity="0.15"/>
+            <!-- Pusaran Angin (Wind Swirls) - Pojok Kiri Atas -->
+            <g stroke="rgba(255, 255, 255, 0.75)" stroke-width="2.2" stroke-linecap="round" fill="none">
+                <!-- Swirl 1 -->
+                <path d="M 40 130 C 90 90, 150 90, 170 130 C 185 160, 150 190, 120 175 C 95 160, 110 125, 135 135" />
+                <path d="M 20 160 Q 70 150 110 160" />
+                
+                <!-- Swirl 2 -->
+                <path d="M 160 80 C 210 40, 270 50, 285 90 C 295 120, 260 145, 235 130 C 215 118, 228 90, 250 98" />
+                <path d="M 130 100 Q 190 90 250 105" />
+
+                <!-- Swirl 3 -->
+                <path d="M 90 210 C 150 170, 220 180, 235 220 C 245 250, 210 275, 185 260 C 165 248, 178 220, 200 228" />
+                <path d="M 140 230 Q 210 220 270 240" />
+
+                <!-- Hembusan Garis Tipis -->
+                <path d="M 260 160 Q 320 150 380 170" stroke-width="1.5" opacity="0.8"/>
+                <path d="M 210 60 Q 270 50 330 70" stroke-width="1.5" opacity="0.8"/>
+            </g>
+
+            <!-- Garis Gelombang Laut (Ocean Wave Contour Lines) -->
+            <g stroke="rgba(255, 255, 255, 0.6)" stroke-width="2" fill="none">
+                <!-- Gelombang Kiri ke Bawah -->
+                <path d="M -50 520 C 150 420, 350 620, 550 470 C 750 320, 950 520, 1200 450" />
+                <path d="M -50 570 C 180 470, 380 670, 580 520 C 780 370, 980 570, 1250 500" stroke-width="1.5"/>
+                <path d="M -50 620 C 200 520, 400 720, 600 570 C 800 420, 1000 620, 1300 550" stroke-width="2" stroke-dasharray="8 6"/>
+                <path d="M -50 680 C 220 580, 420 780, 620 630 C 820 480, 1020 680, 1350 610" />
+                <path d="M -50 740 C 250 640, 450 840, 650 690 C 850 540, 1050 740, 1400 670" opacity="0.8"/>
+                <path d="M -50 800 C 280 700, 480 900, 680 750 C 880 600, 1080 800, 1450 730" opacity="0.6"/>
+
+                <!-- Kontur Kanan (Samping) -->
+                <path d="M 1100 80 C 1250 180, 1300 380, 1500 430" stroke="rgba(255, 255, 255, 0.5)"/>
+                <path d="M 1150 130 C 1280 210, 1330 410, 1500 470" stroke="rgba(255, 255, 255, 0.5)"/>
+                <path d="M 1200 180 C 1310 250, 1360 450, 1500 510" stroke="rgba(255, 255, 255, 0.4)"/>
+            </g>
         </svg>
     </div>
 
