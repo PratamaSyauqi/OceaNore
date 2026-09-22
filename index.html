@@ -65,14 +65,22 @@
             gap: 16px;
         }
 
-        ..logo-img {
+        ./* Styling Badge Logo Resmi */
+.logo-img {
     height: 42px;
     width: auto;
     object-fit: contain;
-    background: #ffffff;
-    padding: 4px 10px;
+    background-color: #ffffff;
+    padding: 4px 12px;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.logo-img:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
 }
 
         .brand-title h1 {
