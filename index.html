@@ -13,7 +13,6 @@
 
     <style>
         :root {
-            /* Palette Warna Biru Navy & Vibrant Orange */
             --primary-dark: #0f172a;    /* Deep Navy */
             --primary: #1e3a8a;         /* Ocean Blue */
             --primary-light: #2563eb;   /* Bright Blue */
@@ -225,10 +224,11 @@
             color: var(--text-main);
         }
 
-        .checkbox-label input[type="checkbox"] {
+        .checkbox-label input[type="checkbox"], .datum-cb {
             accent-color: var(--accent);
-            width: 15px;
-            height: 15px;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
         }
 
         /* Summary Metric Cards */
@@ -288,10 +288,9 @@
 
         .plot-box {
             width: 100%;
-            height: 430px;
+            height: 450px;
         }
 
-        /* Section Tab Display Toggle */
         .page-view {
             display: none;
         }
@@ -300,7 +299,6 @@
             display: block;
         }
 
-        /* Styling Halaman Panduan */
         .guide-box {
             background: #f0f9ff;
             border-left: 4px solid var(--primary-light);
@@ -325,6 +323,15 @@
             background: var(--accent-light);
             color: var(--accent-hover);
             margin-right: 6px;
+        }
+
+        .color-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 6px;
+            vertical-align: middle;
         }
 
         @media (max-width: 900px) {
@@ -352,13 +359,7 @@
     <header class="header">
         <div class="header-container">
             <div class="logo-brand-group">
-                <!-- Logo ITERA (Dukungan JPG & PNG) -->
-                <img src="logo-itera.jpg" alt="Logo ITERA" class="logo-img" 
-                     onerror="this.onerror=null; this.src='logo-itera.png';">
-                
-                <!-- Logo Teknik Geomatika -->
-                <img src="logo-geomatika.jpg" alt="Logo Geomatika" class="logo-img" 
-                     onerror="this.onerror=null; this.src='logo-geomatika.png';">
+                <img src="logo itera.jpg" alt="Logo ITERA" class="logo-img">
             </div>
 
             <div class="brand-title">
@@ -366,7 +367,6 @@
                 <p>Pengolahan Data Pasang Surut & Penentuan Chart Datum</p>
             </div>
 
-            <!-- Navigasi 4 Tab Halaman -->
             <div class="method-tabs">
                 <button class="tab-btn active" onclick="switchMethod('ls')">
                     📊 Least Squares
@@ -387,7 +387,7 @@
     <div class="container">
         <div id="mainGrid" class="grid-layout">
             
-            <!-- PANEL KONTROL KIRI (UNTUK TAB PENGOLAHAN) -->
+            <!-- PANEL KONTROL KIRI -->
             <div id="leftControlPanel">
                 <div class="card">
                     <h2>1. Data Pengamatan</h2>
@@ -461,7 +461,7 @@
                     </div>
 
                     <div class="card">
-                        <h2>Grafik Fit Pasang Surut (Least Squares)</h2>
+                        <h2>Grafik Fit Pasang Surut & Chart Datum (Least Squares)</h2>
                         <div id="plotLS" class="plot-box"></div>
                     </div>
 
@@ -483,17 +483,18 @@
                     </div>
 
                     <div class="card">
-                        <h2>Elevasi Chart Datum</h2>
+                        <h2>Elevasi Chart Datum & Interaktif Plot</h2>
                         <table>
                             <thead>
                                 <tr>
+                                    <th style="width: 50px; text-align:center;">Plot</th>
                                     <th>Singkatan</th>
                                     <th>Deskripsi Datum</th>
                                     <th>Elevasi terhadap Z0 (m)</th>
                                 </tr>
                             </thead>
                             <tbody id="datumTableBody">
-                                <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Belum ada data diolah.</td></tr>
+                                <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Belum ada data diolah.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -540,7 +541,7 @@
                     </div>
 
                     <div class="card">
-                        <h2>Grafik Rekonstruksi Pasut (Admiralty)</h2>
+                        <h2>Grafik Rekonstruksi Pasut & Chart Datum (Admiralty)</h2>
                         <div id="plotAdmiralty" class="plot-box"></div>
                     </div>
 
@@ -562,23 +563,24 @@
                     </div>
 
                     <div class="card">
-                        <h2>Elevasi Chart Datum (Admiralty)</h2>
+                        <h2>Elevasi Chart Datum & Interaktif Plot (Admiralty)</h2>
                         <table>
                             <thead>
                                 <tr>
+                                    <th style="width: 50px; text-align:center;">Plot</th>
                                     <th>Singkatan</th>
                                     <th>Deskripsi Datum</th>
                                     <th>Elevasi terhadap S₀ (m)</th>
                                 </tr>
                             </thead>
                             <tbody id="admDatumTableBody">
-                                <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Belum ada data diolah.</td></tr>
+                                <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Belum ada data diolah.</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- PAGE 4: PANDUAN PENGGUNAAN & PENCEGAHAN ERROR -->
+                <!-- PAGE 4: PANDUAN -->
                 <div id="pagePanduan" class="page-view">
                     <div class="card">
                         <h2>📂 1. Format File Excel / CSV yang Diterima</h2>
@@ -624,38 +626,27 @@
                         <div class="guide-box">
                             <span class="badge">METODE 1</span><b>Least Squares (Kuadrat Terkecil)</b>
                             <ul>
-                                <li><b>Durasi Data:</b> Sangat fleksibel. Bisa mengolah data 3 hari, 7 hari, 15 hari, 30 hari, hingga 1 tahun.</li>
+                                <li><b>Durasi Data:</b> Sangat fleksibel (bisa 3 hari, 15 hari, 30 hari, dll).</li>
                                 <li><b>Toleransi Data:</b> Mampu mengolah data yang memiliki jeda/bolong (*missing data*).</li>
-                                <li><b>Penggunaan Terbaik:</b> Penentuan MSL ($Z_0$) paling akurat, ekstraksi komponen harmonik spesifik, dan perhitungan seluruh datum pasut (MHWS, MLWS, HAT, LAT).</li>
+                                <li><b>Fitur Ceklis Datum:</b> Centang/hapus centang pada tabel Chart Datum untuk menampilkan garis elevasi spesifik pada grafik.</li>
                             </ul>
                         </div>
 
                         <div class="guide-box" style="border-left-color: var(--accent);">
                             <span class="badge" style="background:#ffedd5; color:var(--accent-hover);">METODE 2</span><b>Filter Doodson X₀</b>
                             <ul>
-                                <li><b>Durasi Data:</b> Wajib minimal <b>39 jam berturut-turut</b> tanpa ada data yang terputus/hilang.</li>
-                                <li><b>Fungsi Utama:</b> Menyaring (mereduksi) efek gelombang harian ($K_1, O_1$) dan ganda ($M_2, S_2$) untuk menghasilkan kurva <b>Mean Sea Level (MSL) Dinamis</b> jam-demi-jam.</li>
-                                <li><b>Pencegahan Error:</b> Jangan gunakan metode ini jika durasi data kurang dari 39 jam.</li>
+                                <li><b>Durasi Data:</b> Wajib minimal <b>39 jam berturut-turut</b> tanpa terputus.</li>
+                                <li><b>Fungsi Utama:</b> Menyaring gelombang harian ($K_1, O_1$) dan ganda ($M_2, S_2$) untuk menghasilkan kurva <b>MSL Dinamis</b> jam-demi-jam.</li>
                             </ul>
                         </div>
 
                         <div class="guide-box" style="border-left-color: var(--primary-dark);">
                             <span class="badge" style="background:#e2e8f0; color:var(--primary-dark);">METODE 3</span><b>Metode Admiralty (Form 285)</b>
                             <ul>
-                                <li><b>Durasi Data:</b> Wajib persis <b>15 hari (360 jam)</b> atau <b>29 hari (696 jam)</b> berturut-turut tanpa jeda.</li>
-                                <li><b>Fungsi Utama:</b> Standar pemetaan hidrografi untuk mengisolasi <b>9 komponen pasut utama</b> ($M_2, S_2, N_2, K_2, K_1, O_1, P_1, M_4, MS_4$).</li>
-                                <li><b>Pencegahan Error:</b> Jika data pengamatan kurang dari 15 hari (360 jam), aplikasi akan menampilkan peringatan dan proses dibatalkan. Gunakan Metode Least Squares jika data kurang dari 15 hari.</li>
+                                <li><b>Durasi Data:</b> Wajib persis <b>15 hari (360 jam)</b> atau <b>29 hari (696 jam)</b> berturut-turut.</li>
+                                <li><b>Fungsi Utama:</b> Standar pemetaan hidrografi untuk mengisolasi 9 komponen pasut utama.</li>
                             </ul>
                         </div>
-                    </div>
-
-                    <div class="card">
-                        <h2>⚠️ 3. Checklist Pencegahan Error Saat Upload File</h2>
-                        <ul style="margin-left:20px; font-size:0.9rem; line-height:1.8; color:var(--text-main);">
-                            <li><b>Tanda Desimal:</b> Pastikan angka elevasi menggunakan titik (contoh: <code>2.85</code>), bukan koma (<code>2,85</code>).</li>
-                            <li><b>Header Teks:</b> Baris pertama boleh berupa header kolom (misal: <i>Tanggal, Jam, Tinggi</i>) atau langsung angka data.</li>
-                            <li><b>Cell Kosong / Text Error:</b> Pastikan tidak ada sel berstatus <code>#DIV/0!</code>, <code>#N/A</code>, atau teks bebas di dalam kolom angka elevasi.</li>
-                        </ul>
                     </div>
                 </div>
 
@@ -675,9 +666,25 @@
             0, 1, 1, 0, 2, 0, 1, 1, 0, 2, 0, 0, 1, 0, 1, 0, 0, 1, 1
         ];
 
+        // Skema Warna Garis Datum
+        const DATUM_COLORS = {
+            'HAT': '#7f1d1d',       // Merah Marun Tua
+            'MHWS': '#dc2626',      // Merah Terang
+            'MHWN': '#ea580c',      // Oranye
+            'MSL (Z0)': '#0f172a',  // Hitam Navy (Dashed)
+            'MSL (S₀)': '#0f172a',  // Hitam Navy (Dashed)
+            'MLWN': '#10b981',      // Hijau Emerald
+            'MLWS': '#0284c7',      // Biru Cyan
+            'LAT': '#4338ca'        // Ungu Indigo
+        };
+
         let rawTime = [];
         let rawElevation = [];
         let activeMethod = 'ls';
+
+        // Stored Calculation Cache
+        let lsCalculatedData = null;
+        let admCalculatedData = null;
 
         function switchMethod(method) {
             activeMethod = method;
@@ -695,7 +702,6 @@
                 return;
             }
 
-            // Jika pilih metode pengolahan (LS, Doodson, Admiralty)
             leftPanel.style.display = 'block';
             mainGrid.classList.remove('full-width');
 
@@ -882,10 +888,24 @@
                 { code: 'LAT', desc: 'Lowest Astronomical Tide', val: Z0 - sumAmps }
             ];
 
+            // Render Table Datum dengan Checkbox
             let datumHtml = '';
-            datums.forEach(d => { datumHtml += `<tr><td><b>${d.code}</b></td><td>${d.desc}</td><td>${d.val.toFixed(3)} m</td></tr>`; });
+            datums.forEach(d => {
+                const color = DATUM_COLORS[d.code] || '#0f172a';
+                // Default centang MSL, MHWS, MLWS
+                const defaultChecked = ['MSL (Z0)', 'MHWS', 'MLWS'].includes(d.code) ? 'checked' : '';
+                datumHtml += `<tr>
+                    <td style="text-align:center;">
+                        <input type="checkbox" class="datum-cb ls-datum-cb" value="${d.code}" ${defaultChecked} onchange="drawLSPlot()">
+                    </td>
+                    <td><b style="color:${color};"><span class="color-dot" style="background:${color};"></span>${d.code}</b></td>
+                    <td>${d.desc}</td>
+                    <td><b>${d.val.toFixed(3)} m</b></td>
+                </tr>`;
+            });
             document.getElementById('datumTableBody').innerHTML = datumHtml;
 
+            // Model Rekonstruksi Pasut
             const hPred = [];
             for (let i = 0; i < N; i++) {
                 let val = Z0;
@@ -896,12 +916,53 @@
                 hPred.push(val);
             }
 
-            const days = rawTime.map(t => t / 24);
-            Plotly.newPlot('plotLS', [
-                { x: days, y: rawElevation, mode: 'markers', name: 'Data Pengamatan', marker: { color: '#1e3a8a', size: 4, opacity: 0.5 } },
-                { x: days, y: hPred, mode: 'lines', name: 'Estimasi Least Squares', line: { color: '#f97316', width: 2.5 } },
-                { x: [days[0], days[days.length-1]], y: [Z0, Z0], mode: 'lines', name: 'MSL (Z0)', line: { color: '#0f172a', dash: 'dash' } }
-            ], { margin: { t: 20, r: 20, l: 50, b: 50 }, xaxis: { title: 'Waktu (Hari)' }, yaxis: { title: 'Elevasi (m)' } });
+            // Simpan Cache Data LS
+            lsCalculatedData = {
+                days: rawTime.map(t => t / 24),
+                rawElevation,
+                hPred,
+                datums
+            };
+
+            drawLSPlot();
+        }
+
+        // Draw Plot LS dengan Garis Datum Pilihan
+        function drawLSPlot() {
+            if (!lsCalculatedData) return;
+            const { days, rawElevation, hPred, datums } = lsCalculatedData;
+
+            const traces = [
+                { x: days, y: rawElevation, mode: 'markers', name: 'Data Pengamatan', marker: { color: '#1e3a8a', size: 4, opacity: 0.4 } },
+                { x: days, y: hPred, mode: 'lines', name: 'Estimasi Least Squares', line: { color: '#f97316', width: 2.5 } }
+            ];
+
+            // Tambahkan Garis Datum yang Dicentang
+            document.querySelectorAll('.ls-datum-cb:checked').forEach(cb => {
+                const code = cb.value;
+                const dObj = datums.find(d => d.code === code);
+                if (dObj) {
+                    const color = DATUM_COLORS[code] || '#0f172a';
+                    traces.push({
+                        x: [days[0], days[days.length - 1]],
+                        y: [dObj.val, dObj.val],
+                        mode: 'lines',
+                        name: `${code} (${dObj.val.toFixed(2)}m)`,
+                        line: { 
+                            color: color, 
+                            width: 2, 
+                            dash: code.startsWith('MSL') ? 'dash' : 'dot' 
+                        }
+                    });
+                }
+            });
+
+            Plotly.newPlot('plotLS', traces, {
+                margin: { t: 20, r: 20, l: 50, b: 50 },
+                xaxis: { title: 'Waktu Pengamatan (Hari)' },
+                yaxis: { title: 'Elevasi (meter)' },
+                legend: { orientation: 'h', y: -0.25 }
+            });
         }
 
         // METODE 2: DOODSON X0
@@ -1029,7 +1090,18 @@
             ];
 
             let datumHtml = '';
-            datums.forEach(d => { datumHtml += `<tr><td><b>${d.code}</b></td><td>${d.desc}</td><td>${d.val.toFixed(3)} m</td></tr>`; });
+            datums.forEach(d => {
+                const color = DATUM_COLORS[d.code] || '#0f172a';
+                const defaultChecked = ['MSL (S₀)', 'MHWS', 'MLWS'].includes(d.code) ? 'checked' : '';
+                datumHtml += `<tr>
+                    <td style="text-align:center;">
+                        <input type="checkbox" class="datum-cb adm-datum-cb" value="${d.code}" ${defaultChecked} onchange="drawAdmPlot()">
+                    </td>
+                    <td><b style="color:${color};"><span class="color-dot" style="background:${color};"></span>${d.code}</b></td>
+                    <td>${d.desc}</td>
+                    <td><b>${d.val.toFixed(3)} m</b></td>
+                </tr>`;
+            });
             document.getElementById('admDatumTableBody').innerHTML = datumHtml;
 
             const hPredAdm = [];
@@ -1042,12 +1114,51 @@
                 hPredAdm.push(val);
             }
 
-            const days = rawTime.map(t => t / 24);
-            Plotly.newPlot('plotAdmiralty', [
+            admCalculatedData = {
+                days: rawTime.map(t => t / 24),
+                rawElevation,
+                hPredAdm,
+                datums
+            };
+
+            drawAdmPlot();
+        }
+
+        // Draw Plot Admiralty dengan Garis Datum Pilihan
+        function drawAdmPlot() {
+            if (!admCalculatedData) return;
+            const { days, rawElevation, hPredAdm, datums } = admCalculatedData;
+
+            const traces = [
                 { x: days, y: rawElevation, mode: 'markers', name: 'Data Pengamatan', marker: { color: '#1e3a8a', size: 4, opacity: 0.4 } },
-                { x: days, y: hPredAdm, mode: 'lines', name: 'Model Pasut Admiralty', line: { color: '#f97316', width: 2.5 } },
-                { x: [days[0], days[days.length-1]], y: [S0, S0], mode: 'lines', name: 'MSL Admiralty (S₀)', line: { color: '#0f172a', dash: 'dash' } }
-            ], { margin: { t: 20, r: 20, l: 50, b: 50 }, xaxis: { title: 'Waktu (Hari)' }, yaxis: { title: 'Elevasi (m)' } });
+                { x: days, y: hPredAdm, mode: 'lines', name: 'Model Pasut Admiralty', line: { color: '#f97316', width: 2.5 } }
+            ];
+
+            document.querySelectorAll('.adm-datum-cb:checked').forEach(cb => {
+                const code = cb.value;
+                const dObj = datums.find(d => d.code === code);
+                if (dObj) {
+                    const color = DATUM_COLORS[code] || '#0f172a';
+                    traces.push({
+                        x: [days[0], days[days.length - 1]],
+                        y: [dObj.val, dObj.val],
+                        mode: 'lines',
+                        name: `${code} (${dObj.val.toFixed(2)}m)`,
+                        line: { 
+                            color: color, 
+                            width: 2, 
+                            dash: code.startsWith('MSL') ? 'dash' : 'dot' 
+                        }
+                    });
+                }
+            });
+
+            Plotly.newPlot('plotAdmiralty', traces, {
+                margin: { t: 20, r: 20, l: 50, b: 50 },
+                xaxis: { title: 'Waktu Pengamatan (Hari)' },
+                yaxis: { title: 'Elevasi (meter)' },
+                legend: { orientation: 'h', y: -0.25 }
+            });
         }
 
         window.onload = function() { loadDemoData(); };
