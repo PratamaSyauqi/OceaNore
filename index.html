@@ -50,6 +50,22 @@
             overflow-x: hidden;
         }
 
+        /* Elemen Overlay Garis Gelombang Subtil (Contour Wave Lines) */
+        .wave-bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .wave-bg-overlay svg {
+            width: 100%;
+            height: 100%;
+        }
+
         /* Shape Abstrak Melayang 1 (Pojok Kiri Atas) */
         body::before {
             content: '';
@@ -60,7 +76,7 @@
             height: 380px;
             background: linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(14, 165, 233, 0.08));
             border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
-            z-index: -1;
+            z-index: -2;
             filter: blur(50px);
             animation: floatShape 18s ease-in-out infinite alternate;
         }
@@ -75,7 +91,7 @@
             height: 420px;
             background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(234, 88, 12, 0.06));
             border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-            z-index: -1;
+            z-index: -2;
             filter: blur(60px);
             animation: floatShape 22s ease-in-out infinite alternate-reverse;
         }
@@ -408,6 +424,21 @@
     </style>
 </head>
 <body>
+
+    <!-- ELEMEN DEKORASI GARIS GELOMBANG LATAR BELAKANG -->
+    <div class="wave-bg-overlay">
+        <svg preserveAspectRatio="none" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Gelombang Atas (Biru/Cyan) -->
+            <path d="M-100 180 C 250 80, 550 380, 950 180 C 1350 -20, 1600 280, 1900 180" stroke="#2563eb" stroke-width="1.8" stroke-dasharray="6 6" opacity="0.25"/>
+            <path d="M-100 220 C 300 120, 600 420, 1000 220 C 1400 20, 1650 320, 1950 220" stroke="#0ea5e9" stroke-width="2" opacity="0.2"/>
+            <path d="M-100 260 C 350 160, 650 460, 1050 260 C 1450 60, 1700 360, 2000 260" stroke="#1e3a8a" stroke-width="1.2" opacity="0.2"/>
+            
+            <!-- Gelombang Bawah (Oranye/Cyan) -->
+            <path d="M-100 680 C 300 520, 650 820, 1050 650 C 1450 480, 1700 780, 2000 650" stroke="#f97316" stroke-width="1.8" stroke-dasharray="8 4" opacity="0.2"/>
+            <path d="M-100 720 C 350 560, 700 860, 1100 690 C 1500 520, 1750 820, 2050 690" stroke="#ea580c" stroke-width="1.5" opacity="0.18"/>
+            <path d="M-100 760 C 400 600, 750 900, 1150 730 C 1550 560, 1800 860, 2100 730" stroke="#0ea5e9" stroke-width="2" opacity="0.15"/>
+        </svg>
+    </div>
 
     <!-- HEADER & NAVIGATION -->
     <header class="header">
@@ -867,7 +898,7 @@
             else if (activeMethod === 'admiralty') processAdmiralty();
         }
 
-        // METODE 1: LEAST SQUARES (TERMASUK LOGIKA VALIDASI)
+        // METODE 1: LEAST SQUARES
         function processLeastSquares() {
             if (rawTime.length === 0) return;
 
