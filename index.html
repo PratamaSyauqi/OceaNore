@@ -359,7 +359,8 @@
     <header class="header">
         <div class="header-container">
             <div class="logo-brand-group">
-                <img src="logo itera.jpg" alt="Logo ITERA" class="logo-img">
+                <img src="logo itera.jpg" alt="Logo ITERA" class="logo-img" 
+                     onerror="this.onerror=null; this.src='logo-itera.jpg';">
             </div>
 
             <div class="brand-title">
@@ -410,12 +411,12 @@
                     <div class="checkbox-group">
                         <label class="checkbox-label"><input type="checkbox" class="comp-check" value="M2" checked> M2 (Semi)</label>
                         <label class="checkbox-label"><input type="checkbox" class="comp-check" value="S2" checked> S2 (Semi)</label>
-                        <label class="checkbox-label"><input type="checkbox" class="comp-check" value="N2" checked> N2 (Semi)</label>
-                        <label class="checkbox-label"><input type="checkbox" class="comp-check" value="K2" checked> K2 (Semi)</label>
+                        <label class="checkbox-label"><input type="checkbox" class="comp-check" value="N2"> N2 (Semi)</label>
+                        <label class="checkbox-label"><input type="checkbox" class="comp-check" value="K2"> K2 (Semi)</label>
                         <label class="checkbox-label"><input type="checkbox" class="comp-check" value="K1" checked> K1 (Diurnal)</label>
                         <label class="checkbox-label"><input type="checkbox" class="comp-check" value="O1" checked> O1 (Diurnal)</label>
-                        <label class="checkbox-label"><input type="checkbox" class="comp-check" value="P1" checked> P1 (Diurnal)</label>
-                        <label class="checkbox-label"><input type="checkbox" class="comp-check" value="M4" checked> M4 (Shallow)</label>
+                        <label class="checkbox-label"><input type="checkbox" class="comp-check" value="P1"> P1 (Diurnal)</label>
+                        <label class="checkbox-label"><input type="checkbox" class="comp-check" value="M4"> M4 (Shallow)</label>
                     </div>
 
                     <button class="btn btn-primary" onclick="processLeastSquares()">Hitung Least Squares</button>
@@ -627,8 +628,7 @@
                             <span class="badge">METODE 1</span><b>Least Squares (Kuadrat Terkecil)</b>
                             <ul>
                                 <li><b>Durasi Data:</b> Sangat fleksibel (bisa 3 hari, 15 hari, 30 hari, dll).</li>
-                                <li><b>Toleransi Data:</b> Mampu mengolah data yang memiliki jeda/bolong (*missing data*).</li>
-                                <li><b>Fitur Ceklis Datum:</b> Centang/hapus centang pada tabel Chart Datum untuk menampilkan garis elevasi spesifik pada grafik.</li>
+                                <li><b>Aturan Validasi:</b> Data &lt; 3 hari (&lt; 72 jam) dibatasi maksimal 4 komponen utama (M2, S2, K1, O1) untuk mencegah matriks ill-conditioned.</li>
                             </ul>
                         </div>
 
@@ -666,23 +666,21 @@
             0, 1, 1, 0, 2, 0, 1, 1, 0, 2, 0, 0, 1, 0, 1, 0, 0, 1, 1
         ];
 
-        // Skema Warna Garis Datum
         const DATUM_COLORS = {
-            'HAT': '#7f1d1d',       // Merah Marun Tua
-            'MHWS': '#dc2626',      // Merah Terang
-            'MHWN': '#ea580c',      // Oranye
-            'MSL (Z0)': '#0f172a',  // Hitam Navy (Dashed)
-            'MSL (S₀)': '#0f172a',  // Hitam Navy (Dashed)
-            'MLWN': '#10b981',      // Hijau Emerald
-            'MLWS': '#0284c7',      // Biru Cyan
-            'LAT': '#4338ca'        // Ungu Indigo
+            'HAT': '#7f1d1d',       
+            'MHWS': '#dc2626',      
+            'MHWN': '#ea580c',      
+            'MSL (Z0)': '#0f172a',  
+            'MSL (S₀)': '#0f172a',  
+            'MLWN': '#10b981',      
+            'MLWS': '#0284c7',      
+            'LAT': '#4338ca'        
         };
 
         let rawTime = [];
         let rawElevation = [];
         let activeMethod = 'ls';
 
-        // Stored Calculation Cache
         let lsCalculatedData = null;
         let admCalculatedData = null;
 
@@ -815,12 +813,20 @@
             else if (activeMethod === 'admiralty') processAdmiralty();
         }
 
-        // METODE 1: LEAST SQUARES
+        // METODE 1: LEAST SQUARES (TERMASUK LOGIKA VALIDASI)
         function processLeastSquares() {
             if (rawTime.length === 0) return;
 
             const selectedComps = [];
             document.querySelectorAll('.comp-check:checked').forEach(cb => selectedComps.push(cb.value));
+
+            // LOGIKA VALIDASI DURASI DATA vs JUMLAH KOMPONEN
+            const dataDurationHours = rawTime.length > 0 ? (rawTime[rawTime.length - 1] - rawTime[0] + 1) : 0;
+            if (dataDurationHours < 72 && selectedComps.length > 4) {
+                alert(`⚠️ Peringatan Rayleigh & Overfitting:\n\nData Anda hanya berdurasi ~${Math.round(dataDurationHours)} jam (< 3 hari).\n` +
+                      `Mencentang ${selectedComps.length} komponen dapat menyebabkan matriks ill-conditioned (MSL dan amplitudo tidak akurat).\n\n` +
+                      `Disarankan untuk mencentang MAKSIMAL 4 komponen utama (misal: M2, S2, K1, O1) agar nilai MSL presisi.`);
+            }
 
             const N = rawTime.length;
             const A = [];
@@ -888,11 +894,9 @@
                 { code: 'LAT', desc: 'Lowest Astronomical Tide', val: Z0 - sumAmps }
             ];
 
-            // Render Table Datum dengan Checkbox
             let datumHtml = '';
             datums.forEach(d => {
                 const color = DATUM_COLORS[d.code] || '#0f172a';
-                // Default centang MSL, MHWS, MLWS
                 const defaultChecked = ['MSL (Z0)', 'MHWS', 'MLWS'].includes(d.code) ? 'checked' : '';
                 datumHtml += `<tr>
                     <td style="text-align:center;">
@@ -905,7 +909,6 @@
             });
             document.getElementById('datumTableBody').innerHTML = datumHtml;
 
-            // Model Rekonstruksi Pasut
             const hPred = [];
             for (let i = 0; i < N; i++) {
                 let val = Z0;
@@ -916,7 +919,6 @@
                 hPred.push(val);
             }
 
-            // Simpan Cache Data LS
             lsCalculatedData = {
                 days: rawTime.map(t => t / 24),
                 rawElevation,
@@ -927,7 +929,6 @@
             drawLSPlot();
         }
 
-        // Draw Plot LS dengan Garis Datum Pilihan
         function drawLSPlot() {
             if (!lsCalculatedData) return;
             const { days, rawElevation, hPred, datums } = lsCalculatedData;
@@ -937,7 +938,6 @@
                 { x: days, y: hPred, mode: 'lines', name: 'Estimasi Least Squares', line: { color: '#f97316', width: 2.5 } }
             ];
 
-            // Tambahkan Garis Datum yang Dicentang
             document.querySelectorAll('.ls-datum-cb:checked').forEach(cb => {
                 const code = cb.value;
                 const dObj = datums.find(d => d.code === code);
@@ -1124,7 +1124,6 @@
             drawAdmPlot();
         }
 
-        // Draw Plot Admiralty dengan Garis Datum Pilihan
         function drawAdmPlot() {
             if (!admCalculatedData) return;
             const { days, rawElevation, hPredAdm, datums } = admCalculatedData;
