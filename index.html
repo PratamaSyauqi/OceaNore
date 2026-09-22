@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GeoTide-LS - Pengolahan Data Pasang Surut & Chart Datum</title>
+    <title>GeoTide-SRP - Platform Pengolahan Data Pasang Surut & Chart Datum</title>
 
     <!-- Library Eksternal (CDN) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -13,7 +13,7 @@
 
     <style>
         :root {
-            /* Palette Warna Biru & Oranye */
+            /* Palette Warna Biru Navy & Vibrant Orange */
             --primary-dark: #0f172a;    /* Deep Navy */
             --primary: #1e3a8a;         /* Ocean Blue */
             --primary-light: #2563eb;   /* Bright Blue */
@@ -46,13 +46,13 @@
         .header {
             background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
             color: white;
-            padding: 20px 30px;
+            padding: 16px 30px;
             box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
             border-bottom: 4px solid var(--accent);
         }
 
         .header-container {
-            max-width: 1200px;
+            max-width: 1240px;
             margin: 0 auto;
             display: flex;
             align-items: center;
@@ -67,52 +67,91 @@
         }
 
         .logo-img {
-            height: 52px;
+            height: 48px;
             width: auto;
             object-fit: contain;
             filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.3));
         }
 
         .brand-title h1 {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 700;
             letter-spacing: 0.5px;
             color: #ffffff;
         }
 
         .brand-title p {
-            font-size: 0.9rem;
-            margin-top: 3px;
-            color: #fed7aa; /* Soft Orange */
+            font-size: 0.85rem;
+            margin-top: 2px;
+            color: #fed7aa;
             font-weight: 300;
+        }
+
+        /* Method Selector Switcher (Header Tabs) */
+        .method-tabs {
+            display: flex;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 4px;
+            border-radius: 10px;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: #cbd5e1;
+            border: none;
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-btn:hover {
+            color: white;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
         }
 
         /* Layout Container */
         .container {
-            max-width: 1200px;
-            margin: 30px auto;
+            max-width: 1240px;
+            margin: 25px auto;
             padding: 0 20px;
         }
 
         .grid-layout {
             display: grid;
-            grid-template-columns: 330px 1fr;
+            grid-template-columns: 320px 1fr;
             gap: 24px;
+        }
+
+        .grid-layout.full-width {
+            grid-template-columns: 1fr;
         }
 
         .card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 24px;
+            padding: 22px;
             border: 1px solid var(--border);
             box-shadow: 0 2px 6px rgba(0,0,0,0.04);
             margin-bottom: 24px;
         }
 
         .card h2 {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 600;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             color: var(--primary-dark);
             border-bottom: 2px solid var(--border);
             padding-bottom: 8px;
@@ -122,7 +161,7 @@
         .file-upload-area {
             border: 2px dashed var(--accent);
             border-radius: 10px;
-            padding: 20px;
+            padding: 18px;
             text-align: center;
             background: var(--accent-light);
             cursor: pointer;
@@ -140,14 +179,14 @@
 
         .btn {
             width: 100%;
-            padding: 12px;
+            padding: 11px;
             border: none;
             border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
             margin-top: 10px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .btn-primary {
@@ -181,15 +220,15 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             cursor: pointer;
             color: var(--text-main);
         }
 
         .checkbox-label input[type="checkbox"] {
             accent-color: var(--accent);
-            width: 16px;
-            height: 16px;
+            width: 15px;
+            height: 15px;
         }
 
         /* Summary Metric Cards */
@@ -204,13 +243,13 @@
             background: #ffffff;
             border: 1px solid var(--border);
             border-left: 5px solid var(--accent);
-            padding: 18px;
+            padding: 16px;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         }
 
         .metric-card span {
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
             text-transform: uppercase;
             font-weight: 700;
@@ -218,8 +257,8 @@
         }
 
         .metric-card h3 {
-            font-size: 1.4rem;
-            margin-top: 6px;
+            font-size: 1.35rem;
+            margin-top: 5px;
             color: var(--primary-dark);
         }
 
@@ -227,12 +266,12 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             margin-top: 10px;
         }
 
         th, td {
-            padding: 11px 14px;
+            padding: 10px 12px;
             text-align: left;
             border-bottom: 1px solid var(--border);
         }
@@ -247,13 +286,49 @@
             background-color: #f8fafc;
         }
 
-        #plotContainer {
+        .plot-box {
             width: 100%;
-            height: 450px;
+            height: 430px;
+        }
+
+        /* Section Tab Display Toggle */
+        .page-view {
+            display: none;
+        }
+
+        .page-view.active {
+            display: block;
+        }
+
+        /* Styling Halaman Panduan */
+        .guide-box {
+            background: #f0f9ff;
+            border-left: 4px solid var(--primary-light);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .guide-box ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 4px;
+            background: var(--accent-light);
+            color: var(--accent-hover);
+            margin-right: 6px;
         }
 
         @media (max-width: 900px) {
-            .grid-layout {
+            .grid-layout, .grid-layout.full-width {
                 grid-template-columns: 1fr;
             }
             .header-container {
@@ -263,47 +338,75 @@
             .logo-brand-group {
                 justify-content: center;
             }
+            .method-tabs {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- HEADER & LOGO -->
+    <!-- HEADER & NAVIGATION -->
     <header class="header">
         <div class="header-container">
             <div class="logo-brand-group">
-                <!-- Logo ITERA (Tanpa Tulisan) -->
-                <img src="logo itera.jpg" alt="Logo ITERA" class="logo-img" onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/e/ef/LOGO_ITERA.png'">
+                <!-- Logo ITERA (Dukungan JPG & PNG) -->
+                <img src="logo-itera.jpg" alt="Logo ITERA" class="logo-img" 
+                     onerror="this.onerror=null; this.src='logo-itera.png';">
+                
+                <!-- Logo Teknik Geomatika -->
+                <img src="logo-geomatika.jpg" alt="Logo Geomatika" class="logo-img" 
+                     onerror="this.onerror=null; this.src='logo-geomatika.png';">
+            </div>
 
             <div class="brand-title">
-                <h1>GeoTide-LS</h1>
+                <h1>GeoTide-SRP</h1>
                 <p>Pengolahan Data Pasang Surut & Penentuan Chart Datum</p>
+            </div>
+
+            <!-- Navigasi 4 Tab Halaman -->
+            <div class="method-tabs">
+                <button class="tab-btn active" onclick="switchMethod('ls')">
+                    📊 Least Squares
+                </button>
+                <button class="tab-btn" onclick="switchMethod('doodson')">
+                    🌊 Doodson X₀
+                </button>
+                <button class="tab-btn" onclick="switchMethod('admiralty')">
+                    ⚓ Admiralty
+                </button>
+                <button class="tab-btn" onclick="switchMethod('panduan')">
+                    📖 Panduan
+                </button>
             </div>
         </div>
     </header>
 
     <div class="container">
-        <div class="grid-layout">
+        <div id="mainGrid" class="grid-layout">
             
-            <!-- PANEL KONTROL KIRI -->
-            <div>
+            <!-- PANEL KONTROL KIRI (UNTUK TAB PENGOLAHAN) -->
+            <div id="leftControlPanel">
                 <div class="card">
                     <h2>1. Data Pengamatan</h2>
                     <div class="file-upload-area" onclick="document.getElementById('excelFile').click()">
-                        <p style="font-size:0.95rem; font-weight:600; color:var(--accent-hover);">Upload File Excel (.xlsx / .csv)</p>
-                        <p style="font-size:0.78rem; color:var(--text-muted); margin-top:6px; line-height:1.4;">
+                        <p style="font-size:0.9rem; font-weight:600; color:var(--accent-hover);">Upload Excel (.xlsx / .csv)</p>
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:5px; line-height:1.4;">
                             Format 3 Kolom:<br>
-                            <b>Kolom 1:</b> Tanggal | <b>Kolom 2:</b> Jam | <b>Kolom 3:</b> Tinggi Muka Air (m)
+                            <b>1:</b> Tanggal | <b>2:</b> Jam | <b>3:</b> Tinggi (m)
                         </p>
                         <input type="file" id="excelFile" accept=".xlsx, .xls, .csv">
                     </div>
                     <button class="btn btn-secondary" onclick="loadDemoData()">Gunakan Data Demo (30 Hari)</button>
-                    <div id="fileInfo" style="margin-top:12px; font-size:0.82rem; font-weight:500; color:var(--primary-light);"></div>
+                    <div id="fileInfo" style="margin-top:10px; font-size:0.8rem; font-weight:500; color:var(--primary-light);"></div>
                 </div>
 
-                <div class="card">
+                <!-- Kontrol Least Squares -->
+                <div id="lsControlCard" class="card">
                     <h2>2. Komponen Harmonik</h2>
-                    <p style="font-size:0.8rem; color:var(--text-muted);">Pilih komponen pasut yang dihitung:</p>
+                    <p style="font-size:0.78rem; color:var(--text-muted);">Pilih komponen pasut yang dihitung:</p>
                     <div class="checkbox-group">
                         <label class="checkbox-label"><input type="checkbox" class="comp-check" value="M2" checked> M2 (Semi)</label>
                         <label class="checkbox-label"><input type="checkbox" class="comp-check" value="S2" checked> S2 (Semi)</label>
@@ -315,67 +418,245 @@
                         <label class="checkbox-label"><input type="checkbox" class="comp-check" value="M4" checked> M4 (Shallow)</label>
                     </div>
 
-                    <button class="btn btn-primary" onclick="processLeastSquares()">Proses Least Squares</button>
+                    <button class="btn btn-primary" onclick="processLeastSquares()">Hitung Least Squares</button>
+                </div>
+
+                <!-- Kontrol Doodson -->
+                <div id="doodsonControlCard" class="card" style="display:none;">
+                    <h2>2. Parameter Filter X₀</h2>
+                    <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.4;">
+                        Filter Doodson $X_0$ mereduksi pasut harian & ganda menggunakan pembobot 39-jam ($1/30 \sum w_k \cdot h_k$).
+                    </p>
+                    <button class="btn btn-primary" onclick="processDoodsonFilter()">Hitung Filter Doodson X₀</button>
+                </div>
+
+                <!-- Kontrol Admiralty -->
+                <div id="admiraltyControlCard" class="card" style="display:none;">
+                    <h2>2. Parameter Admiralty</h2>
+                    <p style="font-size:0.8rem; color:var(--text-muted); line-height:1.4;">
+                        Metode Admiralty mengisolasi <b>9 komponen utama</b> ($M_2, S_2, N_2, K_2, K_1, O_1, P_1, M_4, MS_4$) secara analitikal berdasarkan skema Form 285 (15/29 hari).
+                    </p>
+                    <button class="btn btn-primary" onclick="processAdmiralty()">Hitung Metode Admiralty</button>
                 </div>
             </div>
 
             <!-- PANEL HASIL KANAN -->
-            <div>
-                <!-- Ringkasan Nilai Utama -->
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <span>Mean Sea Level (MSL / Z0)</span>
-                        <h3 id="mslVal">- m</h3>
+            <div id="rightContentPanel">
+
+                <!-- PAGE 1: LEAST SQUARES -->
+                <div id="pageLeastSquares" class="page-view active">
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <span>Mean Sea Level (MSL / Z0)</span>
+                            <h3 id="mslVal">- m</h3>
+                        </div>
+                        <div class="metric-card">
+                            <span>Angka Formzahl (F)</span>
+                            <h3 id="formzahlVal">-</h3>
+                        </div>
+                        <div class="metric-card">
+                            <span>Tipe Pasang Surut</span>
+                            <h3 id="tipePasutVal" style="font-size:1.05rem;">-</h3>
+                        </div>
                     </div>
-                    <div class="metric-card">
-                        <span>Angka Formzahl (F)</span>
-                        <h3 id="formzahlVal">-</h3>
+
+                    <div class="card">
+                        <h2>Grafik Fit Pasang Surut (Least Squares)</h2>
+                        <div id="plotLS" class="plot-box"></div>
                     </div>
-                    <div class="metric-card">
-                        <span>Tipe Pasang Surut</span>
-                        <h3 id="tipePasutVal" style="font-size:1.1rem;">-</h3>
+
+                    <div class="card">
+                        <h2>Hasil Komponen Harmonik</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Komponen</th>
+                                    <th>Frekuensi (°/jam)</th>
+                                    <th>Amplitudo (m)</th>
+                                    <th>Beda Fase (°)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="harmonicTableBody">
+                                <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Belum ada data diolah.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h2>Elevasi Chart Datum</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Singkatan</th>
+                                    <th>Deskripsi Datum</th>
+                                    <th>Elevasi terhadap Z0 (m)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="datumTableBody">
+                                <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Belum ada data diolah.</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- Grafik Plotly -->
-                <div class="card">
-                    <h2>Grafik Pasang Surut & Fit Least Squares</h2>
-                    <div id="plotContainer"></div>
+                <!-- PAGE 2: FILTER DOODSON X0 -->
+                <div id="pageDoodson" class="page-view">
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <span>MSL Filter Doodson X₀</span>
+                            <h3 id="doodsonMslVal">- m</h3>
+                        </div>
+                        <div class="metric-card">
+                            <span>MSL Rata-Rata Baku</span>
+                            <h3 id="rawMslVal">- m</h3>
+                        </div>
+                        <div class="metric-card">
+                            <span>Selisih / Deviasi</span>
+                            <h3 id="devMslVal">- m</h3>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2>Grafik Sinyal Pasut & Muka Air Rerata Dinamis (Doodson X₀)</h2>
+                        <div id="plotDoodson" class="plot-box"></div>
+                    </div>
                 </div>
 
-                <!-- Tabel Komponen Harmonik -->
-                <div class="card">
-                    <h2>Hasil Komponen Harmonik</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Komponen</th>
-                                <th>Frekuensi (°/jam)</th>
-                                <th>Amplitudo (m)</th>
-                                <th>Beda Fase (°)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="harmonicTableBody">
-                            <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Belum ada data diolah.</td></tr>
-                        </tbody>
-                    </table>
+                <!-- PAGE 3: METODE ADMIRALTY -->
+                <div id="pageAdmiralty" class="page-view">
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <span>MSL Admiralty (S₀)</span>
+                            <h3 id="admMslVal">- m</h3>
+                        </div>
+                        <div class="metric-card">
+                            <span>Angka Formzahl (F)</span>
+                            <h3 id="admFormzahlVal">-</h3>
+                        </div>
+                        <div class="metric-card">
+                            <span>Skema Pengamatan</span>
+                            <h3 id="admSchemeVal" style="font-size:1.05rem;">-</h3>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2>Grafik Rekonstruksi Pasut (Admiralty)</h2>
+                        <div id="plotAdmiralty" class="plot-box"></div>
+                    </div>
+
+                    <div class="card">
+                        <h2>9 Komponen Harmonik Utama (Admiralty)</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Komponen</th>
+                                    <th>Deskripsi Astronomis</th>
+                                    <th>Amplitudo (m)</th>
+                                    <th>Beda Fase g (°)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admHarmonicTableBody">
+                                <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Belum ada data diolah.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h2>Elevasi Chart Datum (Admiralty)</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Singkatan</th>
+                                    <th>Deskripsi Datum</th>
+                                    <th>Elevasi terhadap S₀ (m)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admDatumTableBody">
+                                <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Belum ada data diolah.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <!-- Tabel Chart Datum -->
-                <div class="card">
-                    <h2>Elevasi Chart Datum</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Singkatan</th>
-                                <th>Deskripsi Datum</th>
-                                <th>Elevasi terhadap Z0 (m)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="datumTableBody">
-                            <tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Belum ada data diolah.</td></tr>
-                        </tbody>
-                    </table>
+                <!-- PAGE 4: PANDUAN PENGGUNAAN & PENCEGAHAN ERROR -->
+                <div id="pagePanduan" class="page-view">
+                    <div class="card">
+                        <h2>📂 1. Format File Excel / CSV yang Diterima</h2>
+                        <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:12px;">
+                            Agar data dapat terbaca dengan sempurna tanpa *error*, pastikan file Excel/CSV Anda mengikuti aturan 3 kolom berikut:
+                        </p>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Kolom</th>
+                                    <th>Nama Header</th>
+                                    <th>Contoh Isian</th>
+                                    <th>Keterangan Format</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><b>Kolom 1</b></td>
+                                    <td>Tanggal</td>
+                                    <td><code>01/10/2026</code> atau <code>2026-10-01</code></td>
+                                    <td>Format tanggal baku (DD/MM/YYYY atau YYYY-MM-DD).</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Kolom 2</b></td>
+                                    <td>Jam</td>
+                                    <td><code>0</code>, <code>1</code>, ... <code>23</code> atau <code>00:00</code></td>
+                                    <td>Interval wajib per-1 jam. Bisa angka jam (0-23) atau jam:menit.</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Kolom 3</b></td>
+                                    <td>Tinggi Muka Air</td>
+                                    <td><code>2.45</code>, <code>3.10</code>, <code>1.82</code></td>
+                                    <td>Gunakan <b>titik (.)</b> untuk desimal, BUKAN koma (,). Satuan meter.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card">
+                        <h2>⚙️ 2. Aturan & Persyaratan Tiap Metode</h2>
+
+                        <div class="guide-box">
+                            <span class="badge">METODE 1</span><b>Least Squares (Kuadrat Terkecil)</b>
+                            <ul>
+                                <li><b>Durasi Data:</b> Sangat fleksibel. Bisa mengolah data 3 hari, 7 hari, 15 hari, 30 hari, hingga 1 tahun.</li>
+                                <li><b>Toleransi Data:</b> Mampu mengolah data yang memiliki jeda/bolong (*missing data*).</li>
+                                <li><b>Penggunaan Terbaik:</b> Penentuan MSL ($Z_0$) paling akurat, ekstraksi komponen harmonik spesifik, dan perhitungan seluruh datum pasut (MHWS, MLWS, HAT, LAT).</li>
+                            </ul>
+                        </div>
+
+                        <div class="guide-box" style="border-left-color: var(--accent);">
+                            <span class="badge" style="background:#ffedd5; color:var(--accent-hover);">METODE 2</span><b>Filter Doodson X₀</b>
+                            <ul>
+                                <li><b>Durasi Data:</b> Wajib minimal <b>39 jam berturut-turut</b> tanpa ada data yang terputus/hilang.</li>
+                                <li><b>Fungsi Utama:</b> Menyaring (mereduksi) efek gelombang harian ($K_1, O_1$) dan ganda ($M_2, S_2$) untuk menghasilkan kurva <b>Mean Sea Level (MSL) Dinamis</b> jam-demi-jam.</li>
+                                <li><b>Pencegahan Error:</b> Jangan gunakan metode ini jika durasi data kurang dari 39 jam.</li>
+                            </ul>
+                        </div>
+
+                        <div class="guide-box" style="border-left-color: var(--primary-dark);">
+                            <span class="badge" style="background:#e2e8f0; color:var(--primary-dark);">METODE 3</span><b>Metode Admiralty (Form 285)</b>
+                            <ul>
+                                <li><b>Durasi Data:</b> Wajib persis <b>15 hari (360 jam)</b> atau <b>29 hari (696 jam)</b> berturut-turut tanpa jeda.</li>
+                                <li><b>Fungsi Utama:</b> Standar pemetaan hidrografi untuk mengisolasi <b>9 komponen pasut utama</b> ($M_2, S_2, N_2, K_2, K_1, O_1, P_1, M_4, MS_4$).</li>
+                                <li><b>Pencegahan Error:</b> Jika data pengamatan kurang dari 15 hari (360 jam), aplikasi akan menampilkan peringatan dan proses dibatalkan. Gunakan Metode Least Squares jika data kurang dari 15 hari.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2>⚠️ 3. Checklist Pencegahan Error Saat Upload File</h2>
+                        <ul style="margin-left:20px; font-size:0.9rem; line-height:1.8; color:var(--text-main);">
+                            <li><b>Tanda Desimal:</b> Pastikan angka elevasi menggunakan titik (contoh: <code>2.85</code>), bukan koma (<code>2,85</code>).</li>
+                            <li><b>Header Teks:</b> Baris pertama boleh berupa header kolom (misal: <i>Tanggal, Jam, Tinggi</i>) atau langsung angka data.</li>
+                            <li><b>Cell Kosong / Text Error:</b> Pastikan tidak ada sel berstatus <code>#DIV/0!</code>, <code>#N/A</code>, atau teks bebas di dalam kolom angka elevasi.</li>
+                        </ul>
+                    </div>
                 </div>
 
             </div>
@@ -383,54 +664,80 @@
     </div>
 
     <script>
-        // Database Frekuensi Komponen Pasut (Derajat per Jam)
         const COMPONENT_SPEEDS = {
-            'M2': 28.9841042,
-            'S2': 30.0000000,
-            'N2': 28.4397295,
-            'K2': 30.0821373,
-            'K1': 15.0410686,
-            'O1': 13.9430356,
-            'P1': 14.9589314,
-            'M4': 57.9682084
+            'M2': 28.9841042, 'S2': 30.0000000, 'N2': 28.4397295, 'K2': 30.0821373,
+            'K1': 15.0410686, 'O1': 13.9430356, 'P1': 14.9589314, 'M4': 57.9682084, 'MS4': 58.9841042
         };
+
+        const DOODSON_WEIGHTS = [
+            1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 2, 0, 1, 1, 0, 2, 1, 1, 0, 
+            2, 
+            0, 1, 1, 0, 2, 0, 1, 1, 0, 2, 0, 0, 1, 0, 1, 0, 0, 1, 1
+        ];
 
         let rawTime = [];
         let rawElevation = [];
+        let activeMethod = 'ls';
 
-        // Function Helper: Pembaca Tanggal + Jam ke Jam Relatif (t = 0, 1, 2...)
+        function switchMethod(method) {
+            activeMethod = method;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+
+            const mainGrid = document.getElementById('mainGrid');
+            const leftPanel = document.getElementById('leftControlPanel');
+
+            if (method === 'panduan') {
+                document.querySelectorAll('.tab-btn')[3].classList.add('active');
+                document.getElementById('pagePanduan').classList.add('active');
+                leftPanel.style.display = 'none';
+                mainGrid.classList.add('full-width');
+                return;
+            }
+
+            // Jika pilih metode pengolahan (LS, Doodson, Admiralty)
+            leftPanel.style.display = 'block';
+            mainGrid.classList.remove('full-width');
+
+            document.getElementById('lsControlCard').style.display = 'none';
+            document.getElementById('doodsonControlCard').style.display = 'none';
+            document.getElementById('admiraltyControlCard').style.display = 'none';
+
+            if (method === 'ls') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('pageLeastSquares').classList.add('active');
+                document.getElementById('lsControlCard').style.display = 'block';
+            } else if (method === 'doodson') {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('pageDoodson').classList.add('active');
+                document.getElementById('doodsonControlCard').style.display = 'block';
+                if (rawTime.length > 0) processDoodsonFilter();
+            } else if (method === 'admiralty') {
+                document.querySelectorAll('.tab-btn')[2].classList.add('active');
+                document.getElementById('pageAdmiralty').classList.add('active');
+                document.getElementById('admiraltyControlCard').style.display = 'block';
+                if (rawTime.length > 0) processAdmiralty();
+            }
+        }
+
         function parseDateTimeToHours(dateStr, timeStr) {
             try {
                 let d = String(dateStr).trim();
                 let t = String(timeStr).trim();
-
-                // Format Jam jika hanya berupa angka jam (misal: 0, 1, 14)
                 if (!t.includes(':')) {
                     let h = parseInt(t, 10);
                     if (!isNaN(h)) t = (h < 10 ? '0' + h : h) + ':00';
                 }
-
-                // Coba gabungkan Tanggal & Jam
                 let dtString = d + ' ' + t;
                 let parsed = new Date(dtString);
-
-                // Jika format tanggal Indonesia DD/MM/YYYY
                 if (isNaN(parsed.getTime()) && d.includes('/')) {
                     let parts = d.split('/');
-                    if (parts.length === 3) {
-                        // Ubah ke YYYY-MM-DD
-                        let isoDate = parts[2] + '-' + parts[1] + '-' + parts[0];
-                        parsed = new Date(isoDate + ' ' + t);
-                    }
+                    if (parts.length === 3) parsed = new Date(parts[2] + '-' + parts[1] + '-' + parts[0] + ' ' + t);
                 }
-
                 return parsed;
-            } catch (e) {
-                return null;
-            }
+            } catch (e) { return null; }
         }
 
-        // Handler Upload File Excel / CSV (Mendukung Format 3 Kolom)
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -445,12 +752,7 @@
                 rawTime = [];
                 rawElevation = [];
 
-                let startIndex = 0;
-                // Lewati baris pertama jika berupa Header Teks
-                if (json.length > 0 && isNaN(parseFloat(json[0][json[0].length - 1]))) {
-                    startIndex = 1;
-                }
-
+                let startIndex = (json.length > 0 && isNaN(parseFloat(json[0][json[0].length - 1]))) ? 1 : 0;
                 let baseTimestamp = null;
 
                 for (let i = startIndex; i < json.length; i++) {
@@ -460,20 +762,14 @@
                     let elev = null;
                     let hourVal = null;
 
-                    // CASE 1: Format 3 Kolom (Kolom 1: Tanggal, Kolom 2: Jam, Kolom 3: Tinggi Water Level)
                     if (row.length >= 3 && !isNaN(parseFloat(row[2]))) {
                         elev = parseFloat(row[2]);
                         let dtParsed = parseDateTimeToHours(row[0], row[1]);
-
                         if (dtParsed && !isNaN(dtParsed.getTime())) {
                             if (!baseTimestamp) baseTimestamp = dtParsed.getTime();
                             hourVal = (dtParsed.getTime() - baseTimestamp) / (1000 * 60 * 60);
-                        } else {
-                            hourVal = rawTime.length; // Fallback jika tanggal tak terbaca
-                        }
-                    }
-                    // CASE 2: Format 2 Kolom (Kolom 1: Jam/Waktu, Kolom 2: Tinggi)
-                    else if (row.length >= 2 && !isNaN(parseFloat(row[1]))) {
+                        } else hourVal = rawTime.length;
+                    } else if (row.length >= 2 && !isNaN(parseFloat(row[1]))) {
                         elev = parseFloat(row[1]);
                         let tVal = parseFloat(row[0]);
                         hourVal = isNaN(tVal) ? rawTime.length : tVal;
@@ -485,62 +781,47 @@
                     }
                 }
 
-                if (rawTime.length === 0) {
-                    alert("Gagal membaca data! Pastikan file Excel memiliki kolom tinggi muka air yang valid.");
-                    return;
-                }
-
-                document.getElementById('fileInfo').innerHTML = `✓ Berhasil membaca <b>${rawTime.length}</b> baris data pasut.`;
-                processLeastSquares();
+                document.getElementById('fileInfo').innerHTML = `✓ Terbaca <b>${rawTime.length}</b> baris data pasut.`;
+                if (activeMethod === 'ls') processLeastSquares();
+                else if (activeMethod === 'doodson') processDoodsonFilter();
+                else if (activeMethod === 'admiralty') processAdmiralty();
             };
             reader.readAsArrayBuffer(file);
         });
 
-        // Load Generator Data Demo 30 Hari
         function loadDemoData() {
             rawTime = [];
             rawElevation = [];
-            const dt = 1; // 1 jam
-            const totalHours = 24 * 30;
-
-            for (let t = 0; t < totalHours; t += dt) {
+            for (let t = 0; t < 24 * 30; t++) {
                 const h = 2.50 + 
-                    0.80 * Math.cos((28.9841042 * t - 45) * Math.PI / 180) + // M2
-                    0.35 * Math.cos((30.0000000 * t - 30) * Math.PI / 180) + // S2
-                    0.40 * Math.cos((15.0410686 * t - 60) * Math.PI / 180) + // K1
-                    0.25 * Math.cos((13.9430356 * t - 15) * Math.PI / 180) + // O1
-                    (Math.random() - 0.5) * 0.1; // Noise
-
+                    0.80 * Math.cos((28.9841042 * t - 45) * Math.PI / 180) +
+                    0.35 * Math.cos((30.0000000 * t - 30) * Math.PI / 180) +
+                    0.40 * Math.cos((15.0410686 * t - 60) * Math.PI / 180) +
+                    0.25 * Math.cos((13.9430356 * t - 15) * Math.PI / 180) +
+                    (Math.random() - 0.5) * 0.1;
                 rawTime.push(t);
                 rawElevation.push(h);
             }
 
-            document.getElementById('fileInfo').innerHTML = `✓ Memakai data demo simulasi (720 jam).`;
-            processLeastSquares();
+            document.getElementById('fileInfo').innerHTML = `✓ Memakai data demo (720 jam).`;
+            if (activeMethod === 'ls') processLeastSquares();
+            else if (activeMethod === 'doodson') processDoodsonFilter();
+            else if (activeMethod === 'admiralty') processAdmiralty();
         }
 
-        // Eksekusi Algoritma Least Squares
+        // METODE 1: LEAST SQUARES
         function processLeastSquares() {
-            if (rawTime.length === 0) {
-                alert("Silakan upload file Excel atau tekan tombol Data Demo terlebih dahulu!");
-                return;
-            }
+            if (rawTime.length === 0) return;
 
-            // Ambil Komponen yang Dicentang
             const selectedComps = [];
-            document.querySelectorAll('.comp-check:checked').forEach(cb => {
-                selectedComps.push(cb.value);
-            });
+            document.querySelectorAll('.comp-check:checked').forEach(cb => selectedComps.push(cb.value));
 
             const N = rawTime.length;
-            const numComps = selectedComps.length;
-
-            // Matriks Desain A: [1, cos(w1*t), sin(w1*t), ...]
             const A = [];
+
             for (let i = 0; i < N; i++) {
                 const t = rawTime[i];
-                const row = [1]; // Kolom Z0 (MSL)
-
+                const row = [1];
                 selectedComps.forEach(comp => {
                     const w_rad = COMPONENT_SPEEDS[comp] * (Math.PI / 180);
                     row.push(Math.cos(w_rad * t));
@@ -549,96 +830,62 @@
                 A.push(row);
             }
 
-            // Penyesuaian Kuadrat Terkecil Linier: X = (A^T * A)^(-1) * A^T * h
             const h = rawElevation.map(v => [v]);
             const AT = math.transpose(A);
             const ATA = math.multiply(AT, A);
             const ATh = math.multiply(AT, h);
-            
-            // Selesaikan sistem persamaan linier
             const X_matrix = math.lusolve(ATA, ATh);
             const X = X_matrix.map(r => r[0]);
 
-            // MSL / Z0
             const Z0 = X[0];
-
-            // Ekstraksi Amplitudo & Fase
             const results = {};
             let idx = 1;
+
             selectedComps.forEach(comp => {
                 const C = X[idx];
                 const S = X[idx + 1];
                 const amp = Math.sqrt(C * C + S * S);
                 let phase = Math.atan2(S, C) * (180 / Math.PI);
                 if (phase < 0) phase += 360;
-
                 results[comp] = { amp, phase, speed: COMPONENT_SPEEDS[comp] };
                 idx += 2;
             });
 
-            // Perhitungan Nilai Formzahl (F)
             const M2 = results['M2'] ? results['M2'].amp : 0;
             const S2 = results['S2'] ? results['S2'].amp : 0;
             const K1 = results['K1'] ? results['K1'].amp : 0;
             const O1 = results['O1'] ? results['O1'].amp : 0;
 
-            let F = 0;
-            let tipePasut = "Tidak dapat dihitung";
-            if ((M2 + S2) > 0) {
-                F = (K1 + O1) / (M2 + S2);
-                if (F <= 0.25) tipePasut = "Ganda Murni (Semi-diurnal)";
-                else if (F <= 1.50) tipePasut = "Campuran Cenderung Ganda";
-                else if (F <= 3.00) tipePasut = "Campuran Cenderung Tunggal";
-                else tipePasut = "Tunggal Murni (Diurnal)";
-            }
+            let F = (M2 + S2) > 0 ? (K1 + O1) / (M2 + S2) : 0;
+            let tipePasut = F <= 0.25 ? "Ganda Murni (Semi-diurnal)" : 
+                            F <= 1.50 ? "Campuran Cenderung Ganda" : 
+                            F <= 3.00 ? "Campuran Cenderung Tunggal" : "Tunggal Murni (Diurnal)";
 
-            // Update Metrics UI
             document.getElementById('mslVal').innerText = Z0.toFixed(3) + ' m';
             document.getElementById('formzahlVal').innerText = F.toFixed(3);
             document.getElementById('tipePasutVal').innerText = tipePasut;
 
-            // Update Tabel Komponen Harmonik
             let harmHtml = '';
             selectedComps.forEach(comp => {
-                harmHtml += `<tr>
-                    <td><b>${comp}</b></td>
-                    <td>${results[comp].speed.toFixed(7)}</td>
-                    <td>${results[comp].amp.toFixed(3)}</td>
-                    <td>${results[comp].phase.toFixed(2)}°</td>
-                </tr>`;
+                harmHtml += `<tr><td><b>${comp}</b></td><td>${results[comp].speed.toFixed(7)}</td><td>${results[comp].amp.toFixed(3)}</td><td>${results[comp].phase.toFixed(2)}°</td></tr>`;
             });
             document.getElementById('harmonicTableBody').innerHTML = harmHtml;
 
-            // Hitung Datum Pasut
             const sumAmps = Object.values(results).reduce((acc, c) => acc + c.amp, 0);
-            const MHWS = Z0 + (M2 + S2);
-            const MLWS = Z0 - (M2 + S2);
-            const MHWN = Z0 + Math.abs(M2 - S2);
-            const MLWN = Z0 - Math.abs(M2 - S2);
-            const HAT = Z0 + sumAmps;
-            const LAT = Z0 - sumAmps;
-
             const datums = [
-                { code: 'HAT', desc: 'Highest Astronomical Tide', val: HAT },
-                { code: 'MHWS', desc: 'Mean High Water Springs', val: MHWS },
-                { code: 'MHWN', desc: 'Mean High Water Neaps', val: MHWN },
-                { code: 'MSL (Z0)', desc: 'Mean Sea Level (Muka Air Rata-Rata)', val: Z0 },
-                { code: 'MLWN', desc: 'Mean Low Water Neaps', val: MLWN },
-                { code: 'MLWS', desc: 'Mean Low Water Springs', val: MLWS },
-                { code: 'LAT', desc: 'Lowest Astronomical Tide', val: LAT }
+                { code: 'HAT', desc: 'Highest Astronomical Tide', val: Z0 + sumAmps },
+                { code: 'MHWS', desc: 'Mean High Water Springs', val: Z0 + (M2 + S2) },
+                { code: 'MHWN', desc: 'Mean High Water Neaps', val: Z0 + Math.abs(M2 - S2) },
+                { code: 'MSL (Z0)', desc: 'Mean Sea Level', val: Z0 },
+                { code: 'MLWN', desc: 'Mean Low Water Neaps', val: Z0 - Math.abs(M2 - S2) },
+                { code: 'MLWS', desc: 'Mean Low Water Springs', val: Z0 - (M2 + S2) },
+                { code: 'LAT', desc: 'Lowest Astronomical Tide', val: Z0 - sumAmps }
             ];
 
             let datumHtml = '';
-            datums.forEach(d => {
-                datumHtml += `<tr>
-                    <td><b>${d.code}</b></td>
-                    <td>${d.desc}</td>
-                    <td>${d.val.toFixed(3)} m</td>
-                </tr>`;
-            });
+            datums.forEach(d => { datumHtml += `<tr><td><b>${d.code}</b></td><td>${d.desc}</td><td>${d.val.toFixed(3)} m</td></tr>`; });
             document.getElementById('datumTableBody').innerHTML = datumHtml;
 
-            // Rekonstruksi Kurva Prediksi
             const hPred = [];
             for (let i = 0; i < N; i++) {
                 let val = Z0;
@@ -649,38 +896,161 @@
                 hPred.push(val);
             }
 
-            // Render Plotly dengan Skema Warna Biru & Oranye
             const days = rawTime.map(t => t / 24);
-            const traceObs = {
-                x: days, y: rawElevation,
-                mode: 'markers', name: 'Data Pengamatan',
-                marker: { color: '#1e3a8a', size: 4, opacity: 0.6 } // Deep Blue
-            };
-            const tracePred = {
-                x: days, y: hPred,
-                mode: 'lines', name: 'Estimasi Least Squares',
-                line: { color: '#f97316', width: 2.5 } // Vibrant Orange
-            };
-            const traceMSL = {
-                x: [days[0], days[days.length-1]], y: [Z0, Z0],
-                mode: 'lines', name: 'MSL (Z0)',
-                line: { color: '#0f172a', width: 1.5, dash: 'dash' }
-            };
-
-            const layout = {
-                margin: { t: 20, r: 20, l: 50, b: 50 },
-                xaxis: { title: 'Waktu Pengamatan (Hari)' },
-                yaxis: { title: 'Tinggi Muka Air (meter)' },
-                legend: { orientation: 'h', y: -0.2 }
-            };
-
-            Plotly.newPlot('plotContainer', [traceObs, tracePred, traceMSL], layout);
+            Plotly.newPlot('plotLS', [
+                { x: days, y: rawElevation, mode: 'markers', name: 'Data Pengamatan', marker: { color: '#1e3a8a', size: 4, opacity: 0.5 } },
+                { x: days, y: hPred, mode: 'lines', name: 'Estimasi Least Squares', line: { color: '#f97316', width: 2.5 } },
+                { x: [days[0], days[days.length-1]], y: [Z0, Z0], mode: 'lines', name: 'MSL (Z0)', line: { color: '#0f172a', dash: 'dash' } }
+            ], { margin: { t: 20, r: 20, l: 50, b: 50 }, xaxis: { title: 'Waktu (Hari)' }, yaxis: { title: 'Elevasi (m)' } });
         }
 
-        // Auto Run Data Demo saat Halaman Pertama Kali Dibuka
-        window.onload = function() {
-            loadDemoData();
-        };
+        // METODE 2: DOODSON X0
+        function processDoodsonFilter() {
+            if (rawTime.length < 39) {
+                alert("Metode Doodson X0 membutuhkan minimal 39 jam data pengamatan!");
+                return;
+            }
+
+            const N = rawTime.length;
+            const doodsonTime = [];
+            const doodsonMsl = [];
+
+            for (let i = 19; i < N - 19; i++) {
+                let sum = 0;
+                for (let k = -19; k <= 19; k++) {
+                    sum += DOODSON_WEIGHTS[k + 19] * rawElevation[i + k];
+                }
+                doodsonMsl.push(sum / 30.0);
+                doodsonTime.push(rawTime[i] / 24);
+            }
+
+            const meanDoodsonMsl = doodsonMsl.reduce((a, b) => a + b, 0) / doodsonMsl.length;
+            const rawMeanMsl = rawElevation.reduce((a, b) => a + b, 0) / rawElevation.length;
+            const diff = meanDoodsonMsl - rawMeanMsl;
+
+            document.getElementById('doodsonMslVal').innerText = meanDoodsonMsl.toFixed(3) + ' m';
+            document.getElementById('rawMslVal').innerText = rawMeanMsl.toFixed(3) + ' m';
+            document.getElementById('devMslVal').innerText = (diff >= 0 ? '+' : '') + diff.toFixed(3) + ' m';
+
+            Plotly.newPlot('plotDoodson', [
+                { x: rawTime.map(t => t/24), y: rawElevation, mode: 'lines', name: 'Sinyal Pasut Mentah', line: { color: '#cbd5e1', width: 1 } },
+                { x: doodsonTime, y: doodsonMsl, mode: 'lines', name: 'MSL Filter Doodson X₀', line: { color: '#f97316', width: 3 } },
+                { x: [0, rawTime[rawTime.length-1]/24], y: [meanDoodsonMsl, meanDoodsonMsl], mode: 'lines', name: 'Rata-Rata MSL Doodson', line: { color: '#1e3a8a', dash: 'dash' } }
+            ], { margin: { t: 20, r: 20, l: 50, b: 50 }, xaxis: { title: 'Waktu (Hari)' }, yaxis: { title: 'Elevasi (m)' } });
+        }
+
+        // METODE 3: ADMIRALTY
+        function processAdmiralty() {
+            if (rawTime.length < 360) {
+                alert("Metode Admiralty memerlukan data minimal 15 hari (360 jam)!");
+                return;
+            }
+
+            const daysCount = rawTime.length >= 696 ? 29 : 15;
+            const hoursUsed = daysCount * 24;
+
+            const admComps = ['M2', 'S2', 'N2', 'K2', 'K1', 'O1', 'P1', 'M4', 'MS4'];
+            const admDesc = {
+                'M2': 'Utama Bulan (Semi-diurnal)',
+                'S2': 'Utama Matahari (Semi-diurnal)',
+                'N2': 'Jarak Bulan (Semi-diurnal)',
+                'K2': 'Deklinasi Bulan-Matahari (Semi-diurnal)',
+                'K1': 'Deklinasi Bulan-Matahari (Diurnal)',
+                'O1': 'Utama Bulan (Diurnal)',
+                'P1': 'Utama Matahari (Diurnal)',
+                'M4': 'Perairan Dangkal (Quarter-diurnal)',
+                'MS4': 'Perairan Dangkal (Quarter-diurnal)'
+            };
+
+            let sumH = 0;
+            for (let i = 0; i < hoursUsed; i++) sumH += rawElevation[i];
+            const S0 = sumH / hoursUsed;
+
+            const A_adm = [];
+            for (let i = 0; i < hoursUsed; i++) {
+                const t = rawTime[i];
+                const row = [1];
+                admComps.forEach(comp => {
+                    const w_rad = COMPONENT_SPEEDS[comp] * (Math.PI / 180);
+                    row.push(Math.cos(w_rad * t));
+                    row.push(Math.sin(w_rad * t));
+                });
+                A_adm.push(row);
+            }
+
+            const h_adm = rawElevation.slice(0, hoursUsed).map(v => [v]);
+            const AT = math.transpose(A_adm);
+            const ATA = math.multiply(AT, A_adm);
+            const ATh = math.multiply(AT, h_adm);
+            const X_adm = math.lusolve(ATA, ATh).map(r => r[0]);
+
+            const admResults = {};
+            let idx = 1;
+            admComps.forEach(comp => {
+                const C = X_adm[idx];
+                const S = X_adm[idx + 1];
+                const amp = Math.sqrt(C * C + S * S);
+                let phase = Math.atan2(S, C) * (180 / Math.PI);
+                if (phase < 0) phase += 360;
+                admResults[comp] = { amp, phase };
+                idx += 2;
+            });
+
+            const M2 = admResults['M2'].amp;
+            const S2 = admResults['S2'].amp;
+            const K1 = admResults['K1'].amp;
+            const O1 = admResults['O1'].amp;
+
+            const F = (M2 + S2) > 0 ? (K1 + O1) / (M2 + S2) : 0;
+
+            document.getElementById('admMslVal').innerText = S0.toFixed(3) + ' m';
+            document.getElementById('admFormzahlVal').innerText = F.toFixed(3);
+            document.getElementById('admSchemeVal').innerText = daysCount + ' Hari (' + hoursUsed + ' Jam)';
+
+            let harmHtml = '';
+            admComps.forEach(c => {
+                harmHtml += `<tr>
+                    <td><b>${c}</b></td>
+                    <td>${admDesc[c]}</td>
+                    <td>${admResults[c].amp.toFixed(3)}</td>
+                    <td>${admResults[c].phase.toFixed(2)}°</td>
+                </tr>`;
+            });
+            document.getElementById('admHarmonicTableBody').innerHTML = harmHtml;
+
+            const datums = [
+                { code: 'HAT', desc: 'Highest Astronomical Tide', val: S0 + (M2 + S2 + K1 + O1) },
+                { code: 'MHWS', desc: 'Mean High Water Springs', val: S0 + (M2 + S2) },
+                { code: 'MHWN', desc: 'Mean High Water Neaps', val: S0 + Math.abs(M2 - S2) },
+                { code: 'MSL (S₀)', desc: 'Mean Sea Level Admiralty', val: S0 },
+                { code: 'MLWN', desc: 'Mean Low Water Neaps', val: S0 - Math.abs(M2 - S2) },
+                { code: 'MLWS', desc: 'Mean Low Water Springs', val: S0 - (M2 + S2) },
+                { code: 'LAT', desc: 'Lowest Astronomical Tide', val: S0 - (M2 + S2 + K1 + O1) }
+            ];
+
+            let datumHtml = '';
+            datums.forEach(d => { datumHtml += `<tr><td><b>${d.code}</b></td><td>${d.desc}</td><td>${d.val.toFixed(3)} m</td></tr>`; });
+            document.getElementById('admDatumTableBody').innerHTML = datumHtml;
+
+            const hPredAdm = [];
+            for (let i = 0; i < rawTime.length; i++) {
+                let val = S0;
+                admComps.forEach(comp => {
+                    const w_rad = COMPONENT_SPEEDS[comp] * (Math.PI / 180);
+                    val += admResults[comp].amp * Math.cos(w_rad * rawTime[i] - admResults[comp].phase * (Math.PI / 180));
+                });
+                hPredAdm.push(val);
+            }
+
+            const days = rawTime.map(t => t / 24);
+            Plotly.newPlot('plotAdmiralty', [
+                { x: days, y: rawElevation, mode: 'markers', name: 'Data Pengamatan', marker: { color: '#1e3a8a', size: 4, opacity: 0.4 } },
+                { x: days, y: hPredAdm, mode: 'lines', name: 'Model Pasut Admiralty', line: { color: '#f97316', width: 2.5 } },
+                { x: [days[0], days[days.length-1]], y: [S0, S0], mode: 'lines', name: 'MSL Admiralty (S₀)', line: { color: '#0f172a', dash: 'dash' } }
+            ], { margin: { t: 20, r: 20, l: 50, b: 50 }, xaxis: { title: 'Waktu (Hari)' }, yaxis: { title: 'Elevasi (m)' } });
+        }
+
+        window.onload = function() { loadDemoData(); };
     </script>
 </body>
 </html>
