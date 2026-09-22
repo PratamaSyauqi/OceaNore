@@ -22,10 +22,10 @@
             --accent-light: #fff7ed;    /* Soft Orange Tint */
             
             --bg: #f8fafc;
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.88);
             --text-main: #1e293b;
             --text-muted: #64748b;
-            --border: #e2e8f0;
+            --border: rgba(226, 232, 240, 0.8);
         }
 
         * {
@@ -35,10 +35,55 @@
             font-family: 'Inter', sans-serif;
         }
 
+        /* Body & Latar Belakang Gradasi Mesh Dinamis */
         body {
-            background-color: var(--bg);
+            background-color: #f1f5f9;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(249, 115, 22, 0.10) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(15, 23, 42, 0.08) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(14, 165, 233, 0.12) 0px, transparent 50%);
+            background-attachment: fixed;
             color: var(--text-main);
             padding-bottom: 50px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Shape Abstrak Melayang 1 (Pojok Kiri Atas) */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 15%;
+            left: -100px;
+            width: 380px;
+            height: 380px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.18), rgba(14, 165, 233, 0.08));
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            z-index: -1;
+            filter: blur(50px);
+            animation: floatShape 18s ease-in-out infinite alternate;
+        }
+
+        /* Shape Abstrak Melayang 2 (Pojok Kanan Bawah) */
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: 5%;
+            right: -80px;
+            width: 420px;
+            height: 420px;
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(234, 88, 12, 0.06));
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            z-index: -1;
+            filter: blur(60px);
+            animation: floatShape 22s ease-in-out infinite alternate-reverse;
+        }
+
+        /* Animasi Soft Floating Shapes */
+        @keyframes floatShape {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            100% { transform: translate(40px, 60px) rotate(120deg) scale(1.1); }
         }
 
         /* Header & Logo */
@@ -48,6 +93,8 @@
             padding: 16px 30px;
             box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
             border-bottom: 4px solid var(--accent);
+            position: relative;
+            z-index: 10;
         }
 
         .header-container {
@@ -66,16 +113,11 @@
         }
 
         .logo-img {
-    height: 48px;
-    width: auto;
-    object-fit: contain;
-    filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.3));
-}
-
-.logo-img:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-}
+            height: 48px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.3));
+        }
 
         .brand-title h1 {
             font-size: 1.5rem;
@@ -131,6 +173,8 @@
             max-width: 1240px;
             margin: 25px auto;
             padding: 0 20px;
+            position: relative;
+            z-index: 1;
         }
 
         .grid-layout {
@@ -143,12 +187,15 @@
             grid-template-columns: 1fr;
         }
 
+        /* Kartu Glassmorphism Modern */
         .card {
-            background: var(--card-bg);
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-radius: 12px;
             padding: 22px;
-            border: 1px solid var(--border);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 24px 0 rgba(15, 23, 42, 0.05);
             margin-bottom: 24px;
         }
 
@@ -157,7 +204,7 @@
             font-weight: 600;
             margin-bottom: 14px;
             color: var(--primary-dark);
-            border-bottom: 2px solid var(--border);
+            border-bottom: 2px solid rgba(226, 232, 240, 0.8);
             padding-bottom: 8px;
         }
 
@@ -167,7 +214,7 @@
             border-radius: 10px;
             padding: 18px;
             text-align: center;
-            background: var(--accent-light);
+            background: rgba(255, 247, 237, 0.8);
             cursor: pointer;
             transition: all 0.2s ease-in-out;
         }
@@ -236,7 +283,7 @@
             cursor: pointer;
         }
 
-        /* Summary Metric Cards */
+        /* Summary Metric Cards (Glassmorphic) */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -245,12 +292,14 @@
         }
 
         .metric-card {
-            background: #ffffff;
-            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
             border-left: 5px solid var(--accent);
             padding: 16px;
             border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
         }
 
         .metric-card span {
@@ -282,13 +331,13 @@
         }
 
         th {
-            background-color: #f1f5f9;
+            background-color: rgba(241, 245, 249, 0.9);
             color: var(--primary-dark);
             font-weight: 600;
         }
 
         tr:hover {
-            background-color: #f8fafc;
+            background-color: rgba(248, 250, 252, 0.8);
         }
 
         .plot-box {
@@ -305,7 +354,7 @@
         }
 
         .guide-box {
-            background: #f0f9ff;
+            background: rgba(240, 249, 255, 0.85);
             border-left: 4px solid var(--primary-light);
             padding: 16px;
             border-radius: 8px;
@@ -966,7 +1015,9 @@
                 margin: { t: 20, r: 20, l: 50, b: 50 },
                 xaxis: { title: 'Waktu Pengamatan (Hari)' },
                 yaxis: { title: 'Elevasi (meter)' },
-                legend: { orientation: 'h', y: -0.25 }
+                legend: { orientation: 'h', y: -0.25 },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(255,255,255,0.6)'
             });
         }
 
@@ -1000,9 +1051,15 @@
 
             Plotly.newPlot('plotDoodson', [
                 { x: rawTime.map(t => t/24), y: rawElevation, mode: 'lines', name: 'Sinyal Pasut Mentah', line: { color: '#cbd5e1', width: 1 } },
-                { x: doodsonTime, y: doodsonMsl, mode: 'lines', name: 'MSL Filter Doodson X₀', line: { color: '#f97316', width: 3 } },
+                { x: doodsonTime, y: doodsonMsl, mode: 'lines+markers', name: 'MSL Filter Doodson X₀', line: { color: '#f97316', width: 3 }, marker: { color: '#f97316', size: 8 } },
                 { x: [0, rawTime[rawTime.length-1]/24], y: [meanDoodsonMsl, meanDoodsonMsl], mode: 'lines', name: 'Rata-Rata MSL Doodson', line: { color: '#1e3a8a', dash: 'dash' } }
-            ], { margin: { t: 20, r: 20, l: 50, b: 50 }, xaxis: { title: 'Waktu (Hari)' }, yaxis: { title: 'Elevasi (m)' } });
+            ], { 
+                margin: { t: 20, r: 20, l: 50, b: 50 }, 
+                xaxis: { title: 'Waktu (Hari)' }, 
+                yaxis: { title: 'Elevasi (m)' },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(255,255,255,0.6)'
+            });
         }
 
         // METODE 3: ADMIRALTY
@@ -1161,7 +1218,9 @@
                 margin: { t: 20, r: 20, l: 50, b: 50 },
                 xaxis: { title: 'Waktu Pengamatan (Hari)' },
                 yaxis: { title: 'Elevasi (meter)' },
-                legend: { orientation: 'h', y: -0.25 }
+                legend: { orientation: 'h', y: -0.25 },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(255,255,255,0.6)'
             });
         }
 
