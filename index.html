@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Analisis Pasang Surut - Metode Least Squares</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- SheetJS (Excel Parser) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Plotly.js (Charts) -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <!-- Math.js (Matrix Calculations) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header / Navbar -->
+    <header class="bg-indigo-900 text-white shadow-lg py-4 px-6 border-b border-indigo-800">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid me-2 fa-water text-cyan-400 text-3xl"></i>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">TideFit - Least Squares Tide Analysis</h1>
+                    <p class="text-xs text-indigo-200">Pengolahan Data Pasang Surut & Penentuan Datum Hydro-Oseanografi</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button id="btn-load-demo" class="bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow flex items-center gap-2">
+                    <i class="fa-solid fa-flask"></i> Muat Data Demo
+                </button>
+                <button id="btn-download-template" class="bg-indigo-700 hover:bg-indigo-600 text-white text-xs font-semibold px-4 py-2 rounded-lg transition border border-indigo-500 flex items-center gap-2">
+                    <i class="fa-solid fa-download"></i> Unduh Template Excel
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto w-full p-4 md:p-6 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Sidebar / Control Panel (4 cols) -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+            
+            <!-- Card 1: Upload File -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <h2 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-file-excel text-emerald-600"></i> 1. Upload Data Pasut
+                </h2>
+                
+                <!-- Dropzone -->
+                <div id="dropzone" class="border-2 border-dashed border-slate-300 hover:border-indigo-500 rounded-lg p-6 text-center cursor-pointer bg-slate-50 transition">
+                    <input type="file" id="file-input" accept=".xlsx, .xls, .csv" class="hidden">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-400 mb-2"></i>
+                    <p class="text-xs font-semibold text-slate-600 mb-1">Klik atau seret file Excel/CSV ke sini</p>
+                    <p class="text-[10px] text-slate-400">Format: Kolom 1 = Waktu (Jam), Kolom 2 = Elevasi (m)</p>
+                </div>
+                <div id="file-info" class="mt-3 text-xs text-emerald-600 font-medium hidden flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check"></i> <span id="file-name">file.xlsx</span> (<span id="row-count">0</span> baris data)
+                </div>
+            </div>
+
+            <!-- Card 2: Pengaturan Komponen Harmonik -->
+            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-indigo-600"></i> 2. Pilih Komponen
+                    </h2>
+                    <button id="btn-select-all" class="text-[11px] text-indigo-600 hover:underline font-semibold">Pilih Semua</button>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2 text-xs" id="components-list">
+                    <!-- Populated dynamically via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Card 3: Eksekusi Process -->
+            <button id="btn-process" disabled class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 text-white font-bold py-3 px-4 rounded-xl shadow transition flex items-center justify-center gap-2 text-sm">
+                <i class="fa-solid fa-calculator"></i> Hitung Least Squares & Datum
+            </button>
+
+            <!-- Card 4: Ringkasan Formzahl & Tipe Pasut (Sembunyi sebelum dihitung) -->
+            <div id="card-summary" class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white p-5 rounded-xl shadow-md hidden">
+                <h3 class="text-xs font-semibold uppercase tracking-wider text-indigo-300 mb-1">Klasifikasi Tipe Pasut</h3>
+                <div class="text-xl font-black text-cyan-300 mb-2" id="res-tide-type">-</div>
+                
+                <div class="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-indigo-800/60">
+                    <div>
+                        <span class="text-slate-400">Nilai Formzahl (F):</span>
+                        <div class="font-bold text-base text-white" id="res-formzahl">0.000</div>
+                    </div>
+                    <div>
+                        <span class="text-slate-400">Mean Sea Level ($Z_0$):</span>
+                        <div class="font-bold text-base text-cyan-300" id="res-msl">0.000 m</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Output Panel (8 cols) -->
+        <div class="lg:col-span-8 flex flex-col gap-6">
+
+            <!-- Placeholder State -->
+            <div id="placeholder-view" class="bg-white rounded-xl border border-slate-200 p-12 text-center flex flex-col items-center justify-center min-h-[400px]">
+                <div class="w-16 h-16 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center text-2xl mb-4">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-700 mb-1">Belum Ada Data Dihitung</h3>
+                <p class="text-xs text-slate-500 max-w-md mb-4">Silakan upload file Excel pasang surut Anda atau klik tombol "Muat Data Demo" untuk memulai analisis secara instant.</p>
+            </div>
+
+            <!-- Output Container (Di-unhide jika ada hasil) -->
+            <div id="output-view" class="hidden flex flex-col gap-6">
+
+                <!-- Grafik Plotly -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-2 px-2">
+                        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-chart-area text-indigo-600"></i> Kurva Fitting & Elemen Datum Pasut
+                        </h3>
+                    </div>
+                    <div id="plotly-chart" class="w-full h-[400px]"></div>
+                </div>
+
+                <!-- Tab Hasil & Ringkasan Datum -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Tabel Datum Pasut -->
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="font-bold text-slate-800 text-sm mb-3 border-b pb-2 flex items-center justify-between">
+                            <span><i class="fa-solid fa-water text-cyan-600 me-2"></i>Elevasi Datum Pasut</span>
+                            <span class="text-[10px] font-normal text-slate-400">(Lokal Zero Chart)</span>
+                        </h3>
+                        <table class="w-full text-xs">
+                            <tbody class="divide-y divide-slate-100" id="table-datums">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Tabel Komponen Harmonik -->
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="font-bold text-slate-800 text-sm mb-3 border-b pb-2 flex items-center justify-between">
+                            <span><i class="fa-solid fa-wave-square text-indigo-600 me-2"></i>Komponen Harmonik</span>
+                            <span class="text-[10px] font-normal text-slate-400">(A & g)</span>
+                        </h3>
+                        <div class="max-h-[220px] overflow-y-auto custom-scrollbar">
+                            <table class="w-full text-xs text-left">
+                                <thead class="bg-slate-50 text-slate-500 uppercase sticky top-0">
+                                    <tr>
+                                        <th class="py-1.5 px-2">Komponen</th>
+                                        <th class="py-1.5 px-2">Amplitudo (m)</th>
+                                        <th class="py-1.5 px-2">Beda Fase (°)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="table-components">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 px-6 text-center text-xs text-slate-500">
+        TideFit &copy; Web-Based Hydro-Oceanographic Least Squares Tide Solver
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        // Daftar Komponen Pasut & Frekuensi Astronomis (derajat/jam)
+        const COMPONENT_DATABASE = [
+            { id: 'M2', name: 'M2 (Utama Bulan Semi-Diurnal)', speed: 28.9841042, defaultChecked: true },
+            { id: 'S2', name: 'S2 (Utama Matahari Semi-Diurnal)', speed: 30.0000000, defaultChecked: true },
+            { id: 'N2', name: 'N2 (Variasi Jarak Bulan)', speed: 28.4397295, defaultChecked: true },
+            { id: 'K2', name: 'K2 (Deklinasi Bulan-Matahari)', speed: 30.0821373, defaultChecked: true },
+            { id: 'K1', name: 'K1 (Deklinasi Bulan-Matahari Diurnal)', speed: 15.0410686, defaultChecked: true },
+            { id: 'O1', name: 'O1 (Utama Bulan Diurnal)', speed: 13.9430356, defaultChecked: true },
+            { id: 'P1', name: 'P1 (Utama Matahari Diurnal)', speed: 14.9589314, defaultChecked: true },
+            { id: 'M4', name: 'M4 (Perairan Dangkal)', speed: 57.9682084, defaultChecked: false }
+        ];
+
+        let rawTideData = []; // [{t: 0, h: 2.5}, ...]
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            renderComponentsList();
+            setupEventListeners();
+        });
+
+        // 1. Render Checkbox Komponen Harmonik
+        function renderComponentsList() {
+            const container = document.getElementById('components-list');
+            container.innerHTML = COMPONENT_DATABASE.map(comp => `
+                <label class="flex items-center gap-2 p-2 rounded hover:bg-slate-50 cursor-pointer border border-slate-100">
+                    <input type="checkbox" value="${comp.id}" ${comp.defaultChecked ? 'checked' : ''} class="comp-checkbox rounded text-indigo-600 focus:ring-indigo-500">
+                    <span class="font-medium text-slate-700">${comp.id}</span>
+                </label>
+            `).join('');
+        }
+
+        // 2. Event Listeners
+        function setupEventListeners() {
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('file-input');
+            const btnProcess = document.getElementById('btn-process');
+            const btnSelectAll = document.getElementById('btn-select-all');
+            const btnLoadDemo = document.getElementById('btn-load-demo');
+            const btnDownloadTemplate = document.getElementById('btn-download-template');
+
+            dropzone.addEventListener('click', () => fileInput.click());
+            
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('border-indigo-500', 'bg-indigo-50/50');
+            });
+
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('border-indigo-500', 'bg-indigo-50/50');
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('border-indigo-500', 'bg-indigo-50/50');
+                if (e.dataTransfer.files.length) {
+                    handleFileUpload(e.dataTransfer.files[0]);
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) {
+                    handleFileUpload(e.target.files[0]);
+                }
+            });
+
+            btnSelectAll.addEventListener('click', () => {
+                const checkboxes = document.querySelectorAll('.comp-checkbox');
+                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                checkboxes.forEach(cb => cb.checked = !allChecked);
+                btnSelectAll.textContent = allChecked ? 'Pilih Semua' : 'Hapus Semua';
+            });
+
+            btnProcess.addEventListener('click', runLeastSquaresAnalysis);
+            btnLoadDemo.addEventListener('click', loadDemoData);
+            btnDownloadTemplate.addEventListener('click', downloadTemplateExcel);
+        }
+
+        // 3. Handle Parsing File Excel / CSV
+        function handleFileUpload(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+                parseTideArray(jsonData, file.name);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function parseTideArray(rows, fileName) {
+            rawTideData = [];
+            // Parse rows, skip headers if present
+            let startIndex = 0;
+            if (isNaN(parseFloat(rows[0][0])) || isNaN(parseFloat(rows[0][1]))) {
+                startIndex = 1;
+            }
+
+            for (let i = startIndex; i < rows.length; i++) {
+                const tVal = parseFloat(rows[i][0]);
+                const hVal = parseFloat(rows[i][1]);
+                if (!isNaN(tVal) && !isNaN(hVal)) {
+                    rawTideData.push({ t: tVal, h: hVal });
+                }
+            }
+
+            if (rawTideData.length > 0) {
+                document.getElementById('file-info').classList.remove('hidden');
+                document.getElementById('file-name').textContent = fileName;
+                document.getElementById('row-count').textContent = rawTideData.length;
+                document.getElementById('btn-process').disabled = false;
+            } else {
+                alert('Format data Excel/CSV tidak valid. Pastikan Kolom 1 = Jam dan Kolom 2 = Elevasi.');
+            }
+        }
+
+        // 4. Generate & Load Demo Data
+        function loadDemoData() {
+            rawTideData = [];
+            const z0 = 2.5;
+            const m2 = 0.8, s2 = 0.35, k1 = 0.4, o1 = 0.25;
+            
+            for (let t = 0; t < 24 * 30; t++) {
+                // Synthetic tide equation with random noise
+                const h = z0 + 
+                    m2 * Math.cos((28.9841042 * t - 45) * Math.PI / 180) +
+                    s2 * Math.cos((30.0000000 * t - 30) * Math.PI / 180) +
+                    k1 * Math.cos((15.0410686 * t - 60) * Math.PI / 180) +
+                    o1 * Math.cos((13.9430356 * t - 15) * Math.PI / 180) +
+                    (Math.random() - 0.5) * 0.1;
+                rawTideData.push({ t: t, h: parseFloat(h.toFixed(3)) });
+            }
+
+            document.getElementById('file-info').classList.remove('hidden');
+            document.getElementById('file-name').textContent = 'Data_Demo_30Hari.xlsx';
+            document.getElementById('row-count').textContent = rawTideData.length;
+            document.getElementById('btn-process').disabled = false;
+
+            runLeastSquaresAnalysis();
+        }
+
+        // 5. Core Engine: Penyesuaian Kuadrat Terkecil (Least Squares)
+        function runLeastSquaresAnalysis() {
+            if (rawTideData.length === 0) return;
+
+            // Dapatkan komponen terpilih
+            const selectedIds = Array.from(document.querySelectorAll('.comp-checkbox:checked')).map(cb => cb.value);
+            if (selectedIds.length === 0) {
+                alert('Pilih minimal 1 komponen pasut!');
+                return;
+            }
+
+            const selectedComponents = COMPONENT_DATABASE.filter(c => selectedIds.includes(c.id));
+            const N = rawTideData.length;
+            const M = selectedComponents.length;
+
+            // Form Matriks Pengamatan A [N x (1 + 2*M)]
+            // X = [Z0, C1, S1, C2, S2, ...]
+            const A = [];
+            const H = [];
+
+            for (let i = 0; i < N; i++) {
+                const t = rawTideData[i].t;
+                const h = rawTideData[i].h;
+                H.push([h]);
+
+                const row = [1]; // Kolom pertama untuk Z0 (MSL)
+                selectedComponents.forEach(comp => {
+                    const w_rad = comp.speed * (Math.PI / 180);
+                    row.push(Math.cos(w_rad * t));
+                    row.push(Math.sin(w_rad * t));
+                });
+                A.push(row);
+            }
+
+            // Solusi Least Squares menggunakan Math.js: X = (A^T * A)^(-1) * A^T * H
+            try {
+                const matA = math.matrix(A);
+                const matH = math.matrix(H);
+                const matAt = math.transpose(matA);
+                
+                const AtA = math.multiply(matAt, matA);
+                const AtA_inv = math.inv(AtA);
+                const AtH = math.multiply(matAt, matH);
+                
+                const matX = math.multiply(AtA_inv, AtH);
+                const X = matX.toArray().map(val => val[0]);
+
+                // Extract Results
+                const Z0 = X[0]; // MSL
+                const resultsComponents = [];
+                let idx = 1;
+
+                selectedComponents.forEach(comp => {
+                    const C = X[idx];
+                    const S = X[idx + 1];
+                    const amp = Math.sqrt(C * C + S * S);
+                    let phaseDeg = Math.atan2(S, C) * (180 / Math.PI);
+                    if (phaseDeg < 0) phaseDeg += 360;
+
+                    resultsComponents.push({
+                        id: comp.id,
+                        amplitude: amp,
+                        phase: phaseDeg
+                    });
+                    idx += 2;
+                });
+
+                // Prediksi Elevasi untuk Plotting (A * X)
+                const H_pred = math.multiply(matA, matX).toArray().map(v => v[0]);
+
+                // Render All Dashboard Data
+                displayResults(Z0, resultsComponents, H_pred);
+
+            } catch (err) {
+                console.error(err);
+                alert('Gagal menghitung Least Squares. Periksa kelengkapan dan kecukupan jumlah data pengamatan.');
+            }
+        }
+
+        // 6. Display Engine
+        function displayResults(Z0, components, hPred) {
+            document.getElementById('placeholder-view').classList.add('hidden');
+            document.getElementById('output-view').classList.remove('hidden');
+            document.getElementById('card-summary').classList.remove('hidden');
+
+            // Map Komponen Utama untuk Formzahl
+            const compMap = {};
+            components.forEach(c => compMap[c.id] = c.amplitude);
+            
+            const M2 = compMap['M2'] || 0;
+            const S2 = compMap['S2'] || 0;
+            const K1 = compMap['K1'] || 0;
+            const O1 = compMap['O1'] || 0;
+
+            // Formzahl & Tipe Pasut
+            let F = 0;
+            let tipePasut = 'Tidak Terdefinisi';
+            if ((M2 + S2) > 0) {
+                F = (K1 + O1) / (M2 + S2);
+                if (F <= 0.25) tipePasut = 'Ganda Murni (Semi-Diurnal)';
+                else if (F <= 1.50) tipePasut = 'Campuran Cenderung Ganda';
+                else if (F <= 3.00) tipePasut = 'Campuran Cenderung Tunggal';
+                else tipePasut = 'Tunggal Murni (Diurnal)';
+            }
+
+            document.getElementById('res-formzahl').textContent = F.toFixed(3);
+            document.getElementById('res-tide-type').textContent = tipePasut;
+            document.getElementById('res-msl').textContent = Z0.toFixed(3) + ' m';
+
+            // Hitung Elevasi Datum
+            const totalAmp = components.reduce((acc, c) => acc + c.amplitude, 0);
+            const datums = [
+                { name: 'HAT (Highest Astronomical Tide)', val: Z0 + totalAmp, color: 'text-purple-600' },
+                { name: 'MHWS (Mean High Water Springs)', val: Z0 + (M2 + S2), color: 'text-indigo-600' },
+                { name: 'MHWN (Mean High Water Neaps)', val: Z0 + Math.abs(M2 - S2), color: 'text-blue-600' },
+                { name: 'MSL (Mean Sea Level)', val: Z0, color: 'text-emerald-600 font-bold' },
+                { name: 'MLWN (Mean Low Water Neaps)', val: Z0 - Math.abs(M2 - S2), color: 'text-teal-600' },
+                { name: 'MLWS (Mean Low Water Springs)', val: Z0 - (M2 + S2), color: 'text-cyan-600' },
+                { name: 'LAT (Lowest Astronomical Tide)', val: Z0 - totalAmp, color: 'text-rose-600' }
+            ];
+
+            // Render Tabel Datum
+            document.getElementById('table-datums').innerHTML = datums.map(d => `
+                <tr class="hover:bg-slate-50">
+                    <td class="py-2 px-1 font-medium ${d.color}">${d.name}</td>
+                    <td class="py-2 px-1 text-right font-semibold text-slate-800">${d.val.toFixed(3)} m</td>
+                </tr>
+            `).join('');
+
+            // Render Tabel Komponen
+            document.getElementById('table-components').innerHTML = components.map(c => `
+                <tr class="hover:bg-slate-50">
+                    <td class="py-1.5 px-2 font-bold text-indigo-900">${c.id}</td>
+                    <td class="py-1.5 px-2">${c.amplitude.toFixed(3)}</td>
+                    <td class="py-1.5 px-2">${c.phase.toFixed(2)}°</td>
+                </tr>
+            `).join('');
+
+            // Plot Grafik Plotly
+            plotChart(Z0, datums, hPred);
+        }
+
+        // 7. Plotting Function (Plotly.js)
+        function plotChart(Z0, datums, hPred) {
+            const timeArr = rawTideData.map(d => d.t / 24); // dalam Hari
+            const hObs = rawTideData.map(d => d.h);
+
+            const traceObs = {
+                x: timeArr,
+                y: hObs,
+                mode: 'markers',
+                name: 'Data Observasi',
+                marker: { color: '#94a3b8', size: 4 }
+            };
+
+            const tracePred = {
+                x: timeArr,
+                y: hPred,
+                mode: 'lines',
+                name: 'Fitting Least Squares',
+                line: { color: '#4f46e5', width: 2 }
+            };
+
+            // Horizontal lines for datums
+            const shapes = datums.map(d => ({
+                type: 'line',
+                xref: 'paper',
+                x0: 0,
+                x1: 1,
+                y0: d.val,
+                y1: d.val,
+                line: {
+                    color: d.name.includes('MSL') ? '#10b981' : (d.name.includes('HW') ? '#6366f1' : '#06b6d4'),
+                    width: d.name.includes('MSL') ? 2 : 1,
+                    dash: 'dash'
+                }
+            }));
+
+            const layout = {
+                margin: { t: 20, r: 20, l: 40, b: 40 },
+                xaxis: { title: 'Waktu Pengamatan (Hari)' },
+                yaxis: { title: 'Elevasi Muka Air (m)' },
+                legend: { orientation: 'h', y: 1.15 },
+                shapes: shapes,
+                autosize: true
+            };
+
+            Plotly.newPlot('plotly-chart', [traceObs, tracePred], layout, { responsive: true });
+        }
+
+        // 8. Download Sample Excel Template
+        function downloadTemplateExcel() {
+            const wb = XLSX.utils.book_new();
+            const wsData = [
+                ['Waktu (Jam)', 'Elevasi (m)'],
+                [0, 2.45], [1, 2.82], [2, 3.10], [3, 3.25], [4, 3.15],
+                [5, 2.85], [6, 2.40], [7, 1.95], [8, 1.60], [9, 1.45]
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, "Data_Pasut");
+            XLSX.writeFile(wb, "Template_Data_Pasut.xlsx");
+        }
+    </script>
+</body>
+</html>
